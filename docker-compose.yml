@@ -25,3 +25,10 @@ services:
       - POSTGRES_USER=root
       - POSTGRES_PASSWORD=root
 
+  ewm-service:
+    build: ewm-main-service/
+    image: ewm-main-service-image
+    container_name: main-service
+    ports:
+      - "8080:8080"
+
