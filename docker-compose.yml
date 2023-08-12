@@ -5,7 +5,7 @@ services:
     image: ewm-stats-service-image
     container_name: stats-server
     ports:
-      - "8080:8080"
+      - "9090:9090"
     depends_on:
       - stats-db
     environment:
