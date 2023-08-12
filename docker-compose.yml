@@ -2,12 +2,13 @@ version: '3.1'
 services:
   stats-server:
     build: ewm-stats-service/stats-service
-    image: ewm-stats-service-image
+    image: ewm-stats-service
     container_name: stats-server
     ports:
       - "9090:9090"
     depends_on:
       - stats-db
+      - stats-client
     environment:
       - DB_URL=jdbc:postgresql://stats-db:5432/stats-server-db
       - POSTGRES_USER=root
@@ -25,3 +26,9 @@ services:
       - POSTGRES_USER=root
       - POSTGRES_PASSWORD=root
 
+  stats-client:
+    build: ewm-stats-service/stats-service-client
+    image: ewm-stats-service-client
+    container_name: stats-client
+    ports:
+      - "8080:8080"
