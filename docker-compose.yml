@@ -25,10 +25,10 @@ services:
       - POSTGRES_USER=root
       - POSTGRES_PASSWORD=root
 
-  stats-client:
-    build: ewm-stats-service/stats-service-client
-    image: ewm-stats-service-client
-    container_name: stats-client
+  ewm-service:
+    build: ewm-main-service/
+    image: ewm-main-service-image
+    container_name: main-service
     ports:
       - "8080:8080"
     environment:
