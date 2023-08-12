@@ -26,9 +26,9 @@ services:
       - POSTGRES_USER=root
       - POSTGRES_PASSWORD=root
 
-  stats-client:
-    build: ewm-stats-service/stats-service-client
-    image: ewm-stats-service-client
-    container_name: stats-client
-    ports:
-      - "9090:9090"
+#  stats-client:
+#    build: ewm-stats-service/stats-service-client
+#    image: ewm-stats-service-client
+#    container_name: stats-client
+#    ports:
+#      - "9090:9090"
