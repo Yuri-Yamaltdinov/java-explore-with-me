@@ -1,15 +1,13 @@
-package ru.practicum.ewm.stats.server.model;
+package ru.practicum.ewm.stats.service.model;
 
 import lombok.*;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
-@Getter
-@Setter
-@ToString
 @AllArgsConstructor
 @NoArgsConstructor
+@Data
 @Builder
 @Entity
 @Table(name = "hits")

@@ -11,6 +11,7 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.DefaultUriBuilderFactory;
 import ru.practicum.ewm.stats.dto.HitRequestDto;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -34,9 +35,9 @@ public class StatsClient {
         makeAndSendRequest(HttpMethod.POST, POST_HIT_PATH, null, hitRequestDto);
     }
 
-    public ResponseEntity<Object> getStatistics(String startTime,
-                                                String endTime,
-                                                String[] uris,
+    public ResponseEntity<Object> getStatistics(LocalDateTime startTime,
+                                                LocalDateTime endTime,
+                                                List<String> uris,
                                                 Boolean unique) {
         Map<String, Object> parameters;
 
