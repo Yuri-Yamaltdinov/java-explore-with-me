@@ -23,11 +23,12 @@ import java.util.List;
 @Slf4j
 public class StatsController {
     public static final String DATE_TIME_PATTERN = "yyyy-MM-dd HH:mm:ss";
+    @Autowired
     private StatsService statsService;
 
     @PostMapping("/hit")
     public ResponseEntity<Void> saveStat(@RequestBody @Valid HitRequestDto hitRequestDto) {
-        log.info("Got request POST /hit with {}", hitRequestDto);
+        log.info("Got request POST /hit, with {}", hitRequestDto);
         statsService.createStat(hitRequestDto);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
@@ -41,7 +42,7 @@ public class StatsController {
                                 @RequestParam(name = "uris", required = false) List<String> uris,
                                 @RequestParam(name = "unique", required = false, defaultValue = "false") boolean unique
     ) {
-        log.info("Got request GET /stats with start: {}, end: {}, uris: {}, unique: {}",
+        log.info("Got request GET /stats, with start: {}, end: {}, uris: {}, unique: {}",
                 start, end, uris, unique);
         return ResponseEntity.ok(statsService.getStats(start, end, uris, unique));
     }

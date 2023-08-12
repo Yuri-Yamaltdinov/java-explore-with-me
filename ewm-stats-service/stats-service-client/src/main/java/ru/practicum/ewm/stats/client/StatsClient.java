@@ -1,6 +1,7 @@
 package ru.practicum.ewm.stats.client;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.*;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
@@ -11,7 +12,6 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.DefaultUriBuilderFactory;
 import ru.practicum.ewm.stats.dto.HitRequestDto;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -24,9 +24,9 @@ public class StatsClient {
     private static final String GET_STATS_PATH_WITHOUT_URIS = "/stats?start={start}&end={end}&unique={unique}";
 
     @Autowired
-    public StatsClient(RestTemplateBuilder builder) {
+    public StatsClient(@Value("${stats-service.url}") String serverUrl, RestTemplateBuilder builder) {
         this.rest = builder
-                .uriTemplateHandler(new DefaultUriBuilderFactory("http://localhost:9090"))
+                .uriTemplateHandler(new DefaultUriBuilderFactory(serverUrl))
                 .requestFactory(HttpComponentsClientHttpRequestFactory::new)
                 .build();
     }
@@ -35,9 +35,9 @@ public class StatsClient {
         makeAndSendRequest(HttpMethod.POST, POST_HIT_PATH, null, hitRequestDto);
     }
 
-    public ResponseEntity<Object> getStatistics(LocalDateTime startTime,
-                                                LocalDateTime endTime,
-                                                List<String> uris,
+    public ResponseEntity<Object> getStatistics(String startTime,
+                                                String endTime,
+                                                String[] uris,
                                                 Boolean unique) {
         Map<String, Object> parameters;
 

@@ -31,7 +31,7 @@ public class StatsClientController {
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
-    @GetMapping("/stats")
+/*    @GetMapping("/stats")
     public ResponseEntity<Object> getStats(
                             @RequestParam(name = "start", required = true)
                             @DateTimeFormat(pattern = DATE_TIME_PATTERN) LocalDateTime start,
@@ -41,6 +41,18 @@ public class StatsClientController {
                             @RequestParam(name = "unique", required = false, defaultValue = "false") Boolean unique) {
         log.info("Got request GET /stats with start: {}, end: {}, uris: {}, unique: {}",
                 start, end, uris, unique);
+
         return statsClient.getStatistics(start, end, uris, unique);
-    }
+    }*/
+    @GetMapping("/stats")
+    public ResponseEntity<Object> getStats(@RequestParam String start,
+                                           @RequestParam String end,
+                                           @RequestParam(required = false) String[] uris,
+                                           @RequestParam(required = false, defaultValue = "false") Boolean unique) {
+    log.info("Got request GET /stats with start: {}, end: {}, uris: {}, unique: {}",
+            start, end, uris, unique);
+
+    return statsClient.getStatistics(start, end, uris, unique);
+}
+
 }
