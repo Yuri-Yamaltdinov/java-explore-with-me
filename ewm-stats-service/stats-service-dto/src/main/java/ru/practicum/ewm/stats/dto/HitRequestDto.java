@@ -9,6 +9,8 @@ import lombok.NoArgsConstructor;
 import javax.validation.constraints.NotBlank;
 import java.time.LocalDateTime;
 
+import static ru.practicum.ewm.stats.dto.util.Constants.DATE_FORMAT;
+
 @Data
 @Builder
 @NoArgsConstructor
@@ -20,6 +22,6 @@ public class HitRequestDto {
     private String uri;
     @NotBlank(message = "Field ip must be filled.")
     private String ip;
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = DATE_FORMAT)
     private LocalDateTime timestamp;
 }
