@@ -1,15 +1,14 @@
-package ru.practicum.ewm.main.service.user.model;
+package ru.practicum.ewm.main.service.category.model;
 
-import lombok.Builder;
-import lombok.Data;
+import lombok.*;
 
 import javax.persistence.*;
 
-@Entity
 @Data
 @Builder
-@Table(name = "users")
-public class User {
+@Entity
+@Table(name = "categories")
+public class Category {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -17,14 +16,11 @@ public class User {
     @Column(nullable = false)
     private String name;
 
-    @Column(length = 512, nullable = false, unique = true)
-    private String email;
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof User)) return false;
-        return id != null && id.equals(((User) o).getId());
+        if (!(o instanceof Category)) return false;
+        return id != null && id.equals(((Category) o).getId());
     }
 
     @Override

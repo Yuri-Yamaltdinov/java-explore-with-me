@@ -18,13 +18,13 @@ import java.util.List;
 @RequiredArgsConstructor
 @Validated
 @Slf4j
-public class UserController {
+public class UserControllerAdmin {
     private final UserService userService;
 
     @GetMapping
     public ResponseEntity<List<UserDto>> getAll(@RequestParam(required = false) Long[] ids,
-                                                @RequestParam(required = false, defaultValue = "0") Integer from,
-                                                @RequestParam(required = false, defaultValue = "10") Integer size,
+                                                @RequestParam(defaultValue = "0") Integer from,
+                                                @RequestParam(defaultValue = "10") Integer size,
                                                 HttpServletRequest request) {
         log.info("Get users. Params={}", request.getParameterMap());
         return ResponseEntity.ok(userService.getAllUsers(ids, from, size));

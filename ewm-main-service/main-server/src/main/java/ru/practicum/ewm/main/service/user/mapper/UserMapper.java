@@ -2,7 +2,7 @@ package ru.practicum.ewm.main.service.user.mapper;
 
 import org.mapstruct.*;
 import ru.practicum.ewm.main.service.user.dto.UserDto;
-import ru.practicum.ewm.main.service.user.dto.UserSimpleDto;
+import ru.practicum.ewm.main.service.user.dto.UserShortDto;
 import ru.practicum.ewm.main.service.user.model.User;
 
 @Mapper(componentModel = "spring")
@@ -12,7 +12,7 @@ public interface UserMapper {
 
     User userFromDto(UserDto userDto);
 
-    UserSimpleDto userToSimpleDto(User user);
+    UserShortDto userToShortDto(User user);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     @Mapping(target = "id", ignore = true)

@@ -1,5 +1,7 @@
 package ru.practicum.ewm.stats.client;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
@@ -11,35 +13,44 @@ import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.DefaultUriBuilderFactory;
 import ru.practicum.ewm.stats.dto.HitRequestDto;
+import ru.practicum.ewm.stats.dto.ViewStatsResponseDto;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+
+import static ru.practicum.ewm.stats.dto.util.Constants.FORMATTER;
 
 @Service
 public class StatsClient {
 
     private final RestTemplate rest;
+    private final ObjectMapper objectMapper;
     private static final String POST_HIT_PATH = "/hit";
     private static final String GET_STATS_PATH = "/stats?start={start}&end={end}&uris={uris}&unique={unique}";
     private static final String GET_STATS_PATH_WITHOUT_URIS = "/stats?start={start}&end={end}&unique={unique}";
 
     @Autowired
-    public StatsClient(@Value("${stats-service.url}") String serverUrl, RestTemplateBuilder builder) {
+    public StatsClient(@Value("${stats-service.url}") String serverUrl, RestTemplateBuilder builder, ObjectMapper objectMapper) {
         this.rest = builder
                 .uriTemplateHandler(new DefaultUriBuilderFactory(serverUrl))
                 .requestFactory(HttpComponentsClientHttpRequestFactory::new)
                 .build();
+        this.objectMapper = objectMapper;
     }
 
     public void createStat(HitRequestDto hitRequestDto) {
         makeAndSendRequest(HttpMethod.POST, POST_HIT_PATH, null, hitRequestDto);
     }
 
-    public ResponseEntity<Object> getStatistics(String startTime,
-                                                String endTime,
-                                                String[] uris,
-                                                Boolean unique) {
+    public List<ViewStatsResponseDto> getStatistics(LocalDateTime start,
+                                                    LocalDateTime end,
+                                                    String[] uris,
+                                                    Boolean unique) {
+        String startTime = start.format(FORMATTER);
+        String endTime = end.format(FORMATTER);
         Map<String, Object> parameters;
+        ResponseEntity<Object> statsServerResponse;
 
         if (uris != null) {
             parameters = Map.of(
@@ -48,15 +59,16 @@ public class StatsClient {
                     "uris", uris,
                     "unique", unique.toString());
 
-            return makeAndSendRequest(HttpMethod.GET, GET_STATS_PATH, parameters, null);
+            statsServerResponse = makeAndSendRequest(HttpMethod.GET, GET_STATS_PATH, parameters, null);
         } else {
             parameters = Map.of(
                     "start", startTime,
                     "end", endTime,
                     "unique", unique.toString());
 
-            return makeAndSendRequest(HttpMethod.GET, GET_STATS_PATH_WITHOUT_URIS, parameters, null);
+            statsServerResponse = makeAndSendRequest(HttpMethod.GET, GET_STATS_PATH_WITHOUT_URIS, parameters, null);
         }
+        return objectMapper.convertValue(statsServerResponse.getBody(), new TypeReference<List<ViewStatsResponseDto>>(){});
 
 
     }

@@ -8,8 +8,16 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.ewm.stats.dto.HitRequestDto;
+import ru.practicum.ewm.stats.dto.ViewStatsResponseDto;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
+import java.net.URLDecoder;
+import java.time.LocalDateTime;
+import java.util.List;
+
+import static java.nio.charset.StandardCharsets.UTF_8;
+import static ru.practicum.ewm.stats.dto.util.Constants.FORMATTER;
 
 @RestController
 @RequestMapping
@@ -29,14 +37,16 @@ public class StatsClientController {
     }
 
     @GetMapping("/stats")
-    public ResponseEntity<Object> getStats(@RequestParam String start,
-                                           @RequestParam String end,
-                                           @RequestParam(required = false) String[] uris,
-                                           @RequestParam(required = false, defaultValue = "false") Boolean unique) {
+    public ResponseEntity<List<ViewStatsResponseDto>> getStats(@RequestParam String start,
+                                                               @RequestParam String end,
+                                                               @RequestParam(required = false) String[] uris,
+                                                               @RequestParam(required = false, defaultValue = "false") Boolean unique,
+                                                               HttpServletRequest request) {
         log.info("Got request GET /stats with start: {}, end: {}, uris: {}, unique: {}",
                 start, end, uris, unique);
-
-        return statsClient.getStatistics(start, end, uris, unique);
+        LocalDateTime startTime = LocalDateTime.parse(URLDecoder.decode(start, UTF_8), FORMATTER);
+        LocalDateTime endTime = LocalDateTime.parse(URLDecoder.decode(end, UTF_8), FORMATTER);
+        return ResponseEntity.ok(statsClient.getStatistics(startTime, endTime, uris, unique));
     }
 
 }
