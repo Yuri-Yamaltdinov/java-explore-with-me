@@ -15,13 +15,14 @@ import javax.validation.Valid;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import static ru.practicum.ewm.stats.dto.util.Constants.DATE_FORMAT;
+
 @RestController
 @RequestMapping
 @RequiredArgsConstructor
 @Validated
 @Slf4j
 public class StatsController {
-    public static final String DATE_TIME_PATTERN = "yyyy-MM-dd HH:mm:ss";
     @Autowired
     private StatsService statsService;
 
@@ -36,9 +37,9 @@ public class StatsController {
     @ResponseStatus(HttpStatus.OK)
     public List<ViewStatsResponseDto> getStats(
             @RequestParam(name = "start", required = true)
-            @DateTimeFormat(pattern = DATE_TIME_PATTERN) LocalDateTime start,
+            @DateTimeFormat(pattern = DATE_FORMAT) LocalDateTime start,
             @RequestParam(name = "end", required = true)
-            @DateTimeFormat(pattern = DATE_TIME_PATTERN) LocalDateTime end,
+            @DateTimeFormat(pattern = DATE_FORMAT) LocalDateTime end,
             @RequestParam(name = "uris", required = false) List<String> uris,
             @RequestParam(name = "unique", defaultValue = "false") boolean unique
     ) {

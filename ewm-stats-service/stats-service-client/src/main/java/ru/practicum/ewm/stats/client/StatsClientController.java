@@ -38,7 +38,7 @@ public class StatsClientController {
     @ResponseStatus(HttpStatus.OK)
     public List<ViewStatsResponseDto> getStats(@RequestParam String start,
                                                @RequestParam String end,
-                                               @RequestParam(required = false) String[] uris,
+                                               @RequestParam(required = false) List<String> uris,
                                                @RequestParam(defaultValue = "false") Boolean unique,
                                                HttpServletRequest request) {
         log.info("Got request GET /stats with start: {}, end: {}, uris: {}, unique: {}",

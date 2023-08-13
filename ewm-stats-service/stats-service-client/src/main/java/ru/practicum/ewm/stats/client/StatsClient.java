@@ -43,10 +43,9 @@ public class StatsClient {
         makeAndSendRequest(HttpMethod.POST, POST_HIT_PATH, null, hitRequestDto);
     }
 
-    public List<ViewStatsResponseDto> getStatistics(LocalDateTime start,
-                                                LocalDateTime end,
-                                                String[] uris,
-                                                Boolean unique) {
+    public List<ViewStatsResponseDto> getStatistics(LocalDateTime start, LocalDateTime end,
+                                                    List<String> uris,
+                                                    Boolean unique) {
 
         String startTime = start.format(FORMATTER);
         String endTime = end.format(FORMATTER);
