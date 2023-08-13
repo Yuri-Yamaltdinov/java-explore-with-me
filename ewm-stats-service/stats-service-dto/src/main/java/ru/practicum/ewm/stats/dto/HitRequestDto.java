@@ -11,11 +11,11 @@ import java.time.LocalDateTime;
 @Builder
 public class HitRequestDto {
     @NotBlank(message = "Field app must be filled.")
-    String app;
+    private String app;
     @NotBlank(message = "Field uri must be filled.")
-    String uri;
+    private String uri;
     @NotBlank(message = "Field ip must be filled.")
-    String ip;
+    private String ip;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    LocalDateTime timestamp;
+    private LocalDateTime timestamp;
 }

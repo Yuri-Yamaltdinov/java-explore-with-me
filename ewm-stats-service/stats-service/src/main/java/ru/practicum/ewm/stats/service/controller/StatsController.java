@@ -47,4 +47,5 @@ public class StatsController {
                 start, end, uris, unique);
         return statsService.getStats(start, end, uris, unique);
     }
+
 }
