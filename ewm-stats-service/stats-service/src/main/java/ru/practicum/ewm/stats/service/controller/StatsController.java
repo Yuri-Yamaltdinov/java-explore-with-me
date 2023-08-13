@@ -5,7 +5,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.ewm.stats.dto.HitRequestDto;
@@ -27,23 +26,24 @@ public class StatsController {
     private StatsService statsService;
 
     @PostMapping("/hit")
-    public ResponseEntity<Void> saveStat(@RequestBody @Valid HitRequestDto hitRequestDto) {
+    @ResponseStatus(HttpStatus.CREATED)
+    public void saveStat(@RequestBody @Valid HitRequestDto hitRequestDto) {
         log.info("Got request POST /hit, with {}", hitRequestDto);
         statsService.createStat(hitRequestDto);
-        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @GetMapping("/stats")
-    public ResponseEntity<List<ViewStatsResponseDto>> getStats(
-                                @RequestParam(name = "start", required = true)
-                                @DateTimeFormat(pattern = DATE_TIME_PATTERN) LocalDateTime start,
-                                @RequestParam(name = "end", required = true)
-                                @DateTimeFormat(pattern = DATE_TIME_PATTERN) LocalDateTime end,
-                                @RequestParam(name = "uris", required = false) List<String> uris,
-                                @RequestParam(name = "unique", required = false, defaultValue = "false") boolean unique
+    @ResponseStatus(HttpStatus.OK)
+    public List<ViewStatsResponseDto> getStats(
+            @RequestParam(name = "start", required = true)
+            @DateTimeFormat(pattern = DATE_TIME_PATTERN) LocalDateTime start,
+            @RequestParam(name = "end", required = true)
+            @DateTimeFormat(pattern = DATE_TIME_PATTERN) LocalDateTime end,
+            @RequestParam(name = "uris", required = false) List<String> uris,
+            @RequestParam(name = "unique", defaultValue = "false") boolean unique
     ) {
         log.info("Got request GET /stats, with start: {}, end: {}, uris: {}, unique: {}",
                 start, end, uris, unique);
-        return ResponseEntity.ok(statsService.getStats(start, end, uris, unique));
+        return statsService.getStats(start, end, uris, unique);
     }
 }
