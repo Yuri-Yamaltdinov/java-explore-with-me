@@ -10,8 +10,14 @@
     </parent>
 
     <artifactId>ewm-main-service</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <packaging>pom</packaging>
 
     <name>Explore With Me Main</name>
+
+    <modules>
+        <module>main-server</module>
+    </modules>
 
     <dependencies>
         <dependency>
