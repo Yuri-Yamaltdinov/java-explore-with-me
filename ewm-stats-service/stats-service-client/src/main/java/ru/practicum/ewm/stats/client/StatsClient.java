@@ -68,7 +68,8 @@ public class StatsClient {
 
             statsServerResponse = makeAndSendRequest(HttpMethod.GET, GET_STATS_PATH_WITHOUT_URIS, parameters, null);
         }
-        return objectMapper.convertValue(statsServerResponse.getBody(), new TypeReference<List<ViewStatsResponseDto>>(){});
+        return objectMapper.convertValue(statsServerResponse.getBody(), new TypeReference<List<ViewStatsResponseDto>>() {
+        });
 
 
     }

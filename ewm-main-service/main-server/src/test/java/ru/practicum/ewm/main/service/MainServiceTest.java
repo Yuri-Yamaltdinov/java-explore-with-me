@@ -1,10 +1,10 @@
-package ru.practicum.ewm.stats.service;
+package ru.practicum.ewm.main.service;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-public class StatsServiceTests {
+public class MainServiceTest {
 
     @Test
     void contextLoads() {

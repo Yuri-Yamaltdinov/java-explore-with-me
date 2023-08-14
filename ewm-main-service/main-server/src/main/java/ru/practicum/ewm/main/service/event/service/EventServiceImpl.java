@@ -33,13 +33,13 @@ import static ru.practicum.ewm.main.service.event.model.State.PUBLISHED;
 public class EventServiceImpl implements EventService {
 
     private final StatsClient statsClient;
+
     private final UserService userService;
     private final EventRepository eventRepository;
     private final EventMapper eventMapper;
     private final LocationRepository locationRepository;
     private final LocationMapper locationMapper;
 
-    //TODO: разобраться с полем view для EventFullDto
     @Override
     public EventFullDto create(Long userId, NewEventDto newEventDto) {
         User initiator = userService.getOrThrow(userId);
@@ -122,7 +122,6 @@ public class EventServiceImpl implements EventService {
         }
     }
 
-    //TODO: уточнить на консультации вариант получения HashMap с данными вместо List
     private Long getViewsFromStatServer(Event event) {
         LocalDateTime start = LocalDateTime.MIN;
         LocalDateTime end = LocalDateTime.MAX;
