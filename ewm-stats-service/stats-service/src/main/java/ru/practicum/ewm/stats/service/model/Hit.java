@@ -7,6 +7,8 @@ import java.time.LocalDateTime;
 
 @Data
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(name = "hits")
 public class Hit {

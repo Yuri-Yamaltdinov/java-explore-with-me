@@ -1,8 +1,10 @@
 package ru.practicum.ewm.main.service.event.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.hibernate.validator.constraints.Length;
 import org.springframework.lang.Nullable;
 import ru.practicum.ewm.main.service.event.model.StateAction;
@@ -14,6 +16,8 @@ import static ru.practicum.ewm.main.service.util.Constants.DATE_FORMAT;
 
 @Data
 @Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class UpdateEventUserRequest {
 
     @Nullable

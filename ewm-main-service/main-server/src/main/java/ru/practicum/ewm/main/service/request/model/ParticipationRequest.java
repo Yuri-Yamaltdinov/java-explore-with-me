@@ -12,6 +12,8 @@ import static ru.practicum.ewm.main.service.request.model.RequestStatus.PENDING;
 
 @Data
 @Builder
+@AllArgsConstructor
+@NoArgsConstructor
 @Entity
 @Table(name = "requests")
 @FieldDefaults(level = AccessLevel.PRIVATE)

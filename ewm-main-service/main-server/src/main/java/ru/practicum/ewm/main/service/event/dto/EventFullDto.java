@@ -1,8 +1,10 @@
 package ru.practicum.ewm.main.service.event.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import ru.practicum.ewm.main.service.category.dto.CategoryDto;
 import ru.practicum.ewm.main.service.event.model.State;
 import ru.practicum.ewm.main.service.location.dto.LocationDto;
@@ -14,6 +16,8 @@ import static ru.practicum.ewm.main.service.util.Constants.DATE_FORMAT;
 
 @Data
 @Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class EventFullDto {
 
     private String annotation;
