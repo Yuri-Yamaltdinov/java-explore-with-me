@@ -31,8 +31,6 @@ public abstract class EventMapper {
 
     public abstract Category categoryFromDto(CategoryDto categoryDto, Long id);
 
-
-
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "category",
@@ -44,6 +42,7 @@ public abstract class EventMapper {
 
     public abstract EventFullDto eventFullDtoFromEvent(Event event, Long views);
 
+    @Mapping(target = "views", source = "views")
     public abstract EventShortDto eventShortDtoFromEvent(Event event, Long views);
 
     public abstract CategoryDto categoryDtoFromCategory(Category category);

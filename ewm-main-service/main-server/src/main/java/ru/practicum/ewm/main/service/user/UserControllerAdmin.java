@@ -3,7 +3,6 @@ package ru.practicum.ewm.main.service.user;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.ewm.main.service.user.dto.UserDto;
@@ -22,24 +21,26 @@ public class UserControllerAdmin {
     private final UserService userService;
 
     @GetMapping
-    public ResponseEntity<List<UserDto>> getAll(@RequestParam(required = false) Long[] ids,
-                                                @RequestParam(defaultValue = "0") Integer from,
-                                                @RequestParam(defaultValue = "10") Integer size,
-                                                HttpServletRequest request) {
+    @ResponseStatus(HttpStatus.OK)
+    public List<UserDto> getAll(@RequestParam(required = false) Long[] ids,
+                                @RequestParam(defaultValue = "0") Integer from,
+                                @RequestParam(defaultValue = "10") Integer size,
+                                HttpServletRequest request) {
         log.info("Get users. Params={}", request.getParameterMap());
-        return ResponseEntity.ok(userService.getAllUsers(ids, from, size));
+        return userService.getAllUsers(ids, from, size);
     }
 
     @PostMapping
-    public ResponseEntity<UserDto> create(@RequestBody @Valid UserDto userDto) {
+    @ResponseStatus(HttpStatus.CREATED)
+    public UserDto create(@RequestBody @Valid UserDto userDto) {
         log.info("Create user, user={}", userDto);
-        return ResponseEntity.status(HttpStatus.CREATED).body(userService.create(userDto));
+        return userService.create(userDto);
     }
 
     @DeleteMapping("/{userId}")
-    public ResponseEntity<Void> delete(@PathVariable Long userId) {
+    @ResponseStatus(HttpStatus.OK)
+    public void delete(@PathVariable Long userId) {
         log.info("Delete user, id={}", userId);
         userService.delete(userId);
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 }
