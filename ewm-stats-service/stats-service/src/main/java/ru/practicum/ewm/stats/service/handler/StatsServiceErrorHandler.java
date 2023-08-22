@@ -1,19 +1,23 @@
 package ru.practicum.ewm.stats.service.handler;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingRequestHeaderException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.servlet.NoHandlerFoundException;
 
 import javax.validation.ConstraintViolationException;
 import javax.validation.ValidationException;
-import java.util.List;
-import java.util.stream.Collectors;
+import java.rmi.AccessException;
+import java.time.LocalDateTime;
+import java.util.Objects;
 
 @RestControllerAdvice
 @Slf4j
@@ -21,65 +25,135 @@ public class StatsServiceErrorHandler {
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponseList handleConstraintViolationException(ConstraintViolationException e) {
+    public ApiError handleValidationException(final ValidationException e) {
         log.error(e.getMessage(), e);
-        return new ErrorResponseList(
-                e.getConstraintViolations().stream()
-                        .map(violation -> new ErrorResponse(
-                                violation.getPropertyPath().toString(),
-                                violation.getMessage()
-                        ))
-                        .collect(Collectors.toList())
-        );
+        return ApiError.builder()
+                .status(HttpStatus.BAD_REQUEST)
+                .reason("Incorrectly made request.")
+                .message(e.getMessage())
+                .timestamp(LocalDateTime.now())
+                .build();
+    }
+
+    @ExceptionHandler(MissingRequestHeaderException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ApiError handleMissingRequestHeaderException(MissingRequestHeaderException e) {
+        log.error("400 — Missing Request Header");
+        return ApiError.builder()
+                .status(HttpStatus.BAD_REQUEST)
+                .reason("Required request header is not present")
+                .message(e.getMessage())
+                .timestamp(LocalDateTime.now())
+                .build();
+    }
+
+    @ExceptionHandler(MissingServletRequestParameterException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ApiError handleMissingServletRequestParameterException(MissingServletRequestParameterException e) {
+        log.error("400 — Missing Servlet Request Parameter");
+        return ApiError.builder()
+                .status(HttpStatus.BAD_REQUEST)
+                .reason("Required request parameter is not present")
+                .message(e.getMessage())
+                .timestamp(LocalDateTime.now())
+                .build();
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ApiError handlerMethodArgumentNotValidException(MethodArgumentNotValidException e) {
+        log.error("400 — Method Argument Not Valid");
+        return ApiError.builder()
+                .status(HttpStatus.BAD_REQUEST)
+                .reason("Incorrectly made request.")
+                .message(e.getMessage())
+                .timestamp(LocalDateTime.now())
+                .build();
     }
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponseList handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
-        log.error(e.getMessage(), e);
-        return new ErrorResponseList(
-                e.getBindingResult().getFieldErrors().stream()
-                        .map(fieldError -> new ErrorResponse(
-                                fieldError.getField(),
-                                fieldError.getDefaultMessage()
-                        ))
-                        .collect(Collectors.toList())
-        );
+    public ApiError handleMethodArgumentTypeMismatchException(final MethodArgumentTypeMismatchException e) {
+        String message = String.format("Переменная %s: %s должна быть %s.",
+                e.getName(), e.getValue(), Objects.requireNonNull(e.getRequiredType()).getSimpleName());
+        log.error("400 — Method Argument Type Mismatch");
+        return ApiError.builder()
+                .status(HttpStatus.BAD_REQUEST)
+                .reason("Incorrectly made request.")
+                .message(message)
+                .timestamp(LocalDateTime.now())
+                .build();
     }
 
-    @ExceptionHandler
+    @ExceptionHandler(ConstraintViolationException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse handleValidationException(ValidationException e) {
-        log.error(e.getMessage(), e);
-        return new ErrorResponse("Unrecognized param", e.getMessage());
-    }
-
-    @ExceptionHandler
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse handleValidationException(MissingServletRequestParameterException e) {
-        log.error(e.getMessage(), e);
-        return new ErrorResponse(e.getParameterName(), e.getMessage());
+    public ApiError handleHibernateViolationException(ConstraintViolationException e) {
+        log.error("400 — Constraint Violation");
+        return ApiError.builder()
+                .status(HttpStatus.CONFLICT)
+                .reason("Integrity constraint has been violated.")
+                .message(e.getMessage())
+                .timestamp(LocalDateTime.now())
+                .build();
     }
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public ErrorResponse handleThrowable(Throwable e) {
-        log.error(e.getMessage(), e);
-        return new ErrorResponse("Unrecognized param", e.getMessage());
+    public ApiError handleThrowable(final Throwable e) {
+        log.error("500 — Произошла непредвиденная ошибка.");
+        return ApiError.builder()
+                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .reason("An unexpected error has occurred.")
+                .message(e.getMessage())
+                .timestamp(LocalDateTime.now())
+                .build();
     }
 
-    @Getter
-    @AllArgsConstructor
-    private class ErrorResponseList {
-        private final List<ErrorResponse> errorResponses;
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    public ApiError handleAccessException(AccessException e) {
+        log.error("403 — Доступ запрещен.");
+        return ApiError.builder()
+                .status(HttpStatus.FORBIDDEN)
+                .reason("For the requested operation the conditions are not met.")
+                .message(e.getMessage())
+                .timestamp(LocalDateTime.now())
+                .build();
     }
 
-    @Getter
-    @AllArgsConstructor
-    private class ErrorResponse {
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ApiError handleNoHandlerFoundException(final NoHandlerFoundException e, WebRequest request) {
+        log.error("Unknown request");
+        return ApiError.builder()
+                .status(HttpStatus.BAD_REQUEST)
+                .reason("The required object was not found.")
+                .message(e.getMessage())
+                .timestamp(LocalDateTime.now())
+                .build();
+    }
 
-        private String paramName;
-        private String error;
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ApiError handleIllegalArgumentException(final IllegalArgumentException e) {
+        log.error("Incorrect request");
+        return ApiError.builder()
+                .status(HttpStatus.BAD_REQUEST)
+                .reason("Incorrectly made request.")
+                .message(e.getMessage())
+                .timestamp(LocalDateTime.now())
+                .build();
+    }
 
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ApiError handleHttpMessageNotReadableException(final HttpMessageNotReadableException e) {
+        log.error("Required request body is missing");
+        return ApiError.builder()
+                .status(HttpStatus.BAD_REQUEST)
+                .reason("Incorrectly made request.")
+                .message(e.getMessage())
+                .timestamp(LocalDateTime.now())
+                .build();
     }
 }

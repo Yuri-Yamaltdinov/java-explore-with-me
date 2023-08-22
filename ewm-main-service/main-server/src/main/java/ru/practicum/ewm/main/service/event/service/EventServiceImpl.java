@@ -14,8 +14,8 @@ import ru.practicum.ewm.main.service.event.model.State;
 import ru.practicum.ewm.main.service.event.model.StateAction;
 import ru.practicum.ewm.main.service.event.repository.EventRepository;
 import ru.practicum.ewm.main.service.exception.AccessException;
+import ru.practicum.ewm.main.service.exception.CustomValidationException;
 import ru.practicum.ewm.main.service.exception.EntityNotFoundException;
-import ru.practicum.ewm.main.service.exception.ValidationException;
 import ru.practicum.ewm.main.service.location.mapper.LocationMapper;
 import ru.practicum.ewm.main.service.location.model.Location;
 import ru.practicum.ewm.main.service.location.repository.LocationRepository;
@@ -28,9 +28,8 @@ import ru.practicum.ewm.stats.dto.ViewStatsResponseDto;
 
 import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import static ru.practicum.ewm.main.service.event.model.State.*;
 
@@ -39,7 +38,6 @@ import static ru.practicum.ewm.main.service.event.model.State.*;
 public class EventServiceImpl implements EventService {
 
     private final StatsClient statsClient;
-
     private final UserService userService;
     private final EventRepository eventRepository;
     private final EventMapper eventMapper;
@@ -55,9 +53,8 @@ public class EventServiceImpl implements EventService {
         try {
             location = locationRepository.save(locationMapper.locationFromDto(newEventDto.getLocation()));
         } catch (DataIntegrityViolationException e) {
-            throw new ValidationException("Incorrect location values");
+            throw new CustomValidationException("Incorrect location values");
         }
-
 
         Event event = eventMapper.eventFromNewEventDto(newEventDto, initiator, location);
         Event savedEvent = eventRepository.save(event);
@@ -124,9 +121,7 @@ public class EventServiceImpl implements EventService {
         Long views = getViewsFromStatServer(event);
         Location location = locationRepository.save(locationMapper.locationFromDto(updateEventUserRequest.getLocation()));
 
-        eventMapper.updateEventFromDto(event,
-                updateEventUserRequest,
-                location);
+        eventMapper.updateEventFromDto(event, updateEventUserRequest, location);
         return eventMapper.eventFullDtoFromEvent(eventRepository.save(event), views);
     }
 
@@ -143,49 +138,68 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    public List<EventShortDto> getAllEventsPublic(String text, List<Long> categories, Boolean paid, LocalDateTime rangeStart, LocalDateTime rangeEnd, Boolean onlyAvailable, String sort, Integer from, Integer size, HttpServletRequest request) {
-        if (rangeStart.isAfter(rangeEnd)) {
-            throw new ValidationException("Start must be after End");
-        }
-        SortValues sortValue = SortValues.from(sort)
-                .orElseThrow(() -> new ValidationException(String.format("Unsupported status = %s", sort)));
-        Pagination page = new Pagination(from, size);
-
-        List<Event> events = eventRepository.findAllByParamsPublic(text, categories, paid, rangeStart, rangeEnd, onlyAvailable, page);
-        List<EventShortDto> result = new ArrayList<>();
-        sendStat(request);
-        for (Event event : events) {
-            Long views = getViewsFromStatServer(event);
-            result.add(eventMapper.eventShortDtoFromEvent(event, views));
-        }
-        return result;
-    }
-
-    @Override
     public EventFullDto getEventPublic(Long eventId, HttpServletRequest request) {
         Event event = getOrThrow(eventId);
         if (!event.getState().equals(PUBLISHED)) {
             throw new EntityNotFoundException(Event.class, "Event is not PUBLISHED.");
         }
         Long views = getViewsFromStatServer(event);
-        sendStat(request);
+        addHit(request);
         return eventMapper.eventFullDtoFromEvent(event, views);
     }
 
     @Override
-    public List<EventFullDto> getAllEventsAdmin(List<Long> users, List<State> states, List<Long> categories, LocalDateTime rangeStart, LocalDateTime rangeEnd, Integer from, Integer size) {
-        if (rangeStart.isAfter(rangeEnd)) {
-            throw new ValidationException("Start date and time must be after End");
+    public List<EventShortDto> getAllEventsPublic(String text, List<Long> categories,
+                                                  Boolean paid, LocalDateTime rangeStart,
+                                                  LocalDateTime rangeEnd,
+                                                  Boolean onlyAvailable,
+                                                  String sort,
+                                                  Integer from,
+                                                  Integer size,
+                                                  HttpServletRequest request) {
+        if (rangeStart != null && rangeEnd != null && rangeStart.isAfter(rangeEnd)) {
+            throw new CustomValidationException("Start must be after End");
         }
+        Pagination page = new Pagination(from, size);
+        List<Event> events = eventRepository.
+                            findAllByParamsPublic(text, categories, paid, rangeStart, rangeEnd, onlyAvailable, page);
+        List<EventShortDto> result = eventMapper.eventShortDtoListFromListEvent(events);
 
+        if (sort != null) {
+            SortValues sortValue = SortValues.from(sort).orElseThrow(() ->
+                            new CustomValidationException(String.format("Unsupported status = %s", sort)));
+            switch (sortValue) {
+                case VIEWS:
+                    result.sort((o1, o2) -> (int) (o1.getViews() - o2.getViews()));
+                    break;
+                case EVENT_DATE:
+                    result.sort(Comparator.comparing(EventShortDto::getEventDate));
+            }
+        }
+        addHit(request);
+        return result;
+    }
+
+    @Override
+    public List<EventFullDto> getAllEventsAdmin(List<Long> users,
+                                                List<State> states,
+                                                List<Long> categories,
+                                                LocalDateTime rangeStart,
+                                                LocalDateTime rangeEnd,
+                                                Integer from,
+                                                Integer size) {
+        if (rangeStart != null && rangeEnd != null
+                && rangeStart.isAfter(rangeEnd)) {
+            throw new CustomValidationException("Start date and time must be after End");
+        }
         Pagination page = new Pagination(from, size);
         List<Event> events = eventRepository.findAllByParamsAdmin(users, states, categories, rangeStart, rangeEnd, page);
         List<EventFullDto> result = new ArrayList<>();
-        for (Event event : events) {
-            Long views = getViewsFromStatServer(event);
-            result.add(eventMapper.eventFullDtoFromEvent(event, views));
-        }
+        Map<String, Long> statistics = getViewsFromStatServer(events);
 
+        for (Event event : events) {
+            result.add(eventMapper.eventFullDtoFromEvent(event, statistics.get("/events/" + event.getId())));
+        }
         return result;
     }
 
@@ -193,15 +207,13 @@ public class EventServiceImpl implements EventService {
     public EventFullDto updateEventAdmin(Long eventId, UpdateEventUserRequest updateEventUserRequest) {
         Event event = getOrThrow(eventId);
         Long timeDiff = 1L;
-        if (updateEventUserRequest.getStateAction().equals(StateAction.PUBLISH_EVENT) &&
-                event.getState().equals(PENDING)) {
+        if (updateEventUserRequest.getStateAction().equals(StateAction.PUBLISH_EVENT) && event.getState().equals(PENDING)) {
             event.setState(PUBLISHED);
         } else {
             throw new AccessException("Event status is not PENDING. Event can't be PUBLISHED.");
         }
 
-        if (updateEventUserRequest.getStateAction().equals(StateAction.REJECT_EVENT) &&
-                !event.getState().equals(PUBLISHED)) {
+        if (updateEventUserRequest.getStateAction().equals(StateAction.REJECT_EVENT) && !event.getState().equals(PUBLISHED)) {
             event.setState(CANCELED);
         } else {
             throw new AccessException("Event status is PUBLISHED. Event can't be CANCELED.");
@@ -213,25 +225,43 @@ public class EventServiceImpl implements EventService {
         Long views = getViewsFromStatServer(event);
         Location location = locationRepository.save(locationMapper.locationFromDto(updateEventUserRequest.getLocation()));
 
-        eventMapper.updateEventFromDto(event,
-                updateEventUserRequest,
-                location);
+        eventMapper.updateEventFromDto(event, updateEventUserRequest, location);
         return eventMapper.eventFullDtoFromEvent(eventRepository.save(event), views);
     }
 
-    private void sendStat(HttpServletRequest request) {
+    @Override
+    public Map<String, Long> getViewsFromStatServer(List<Event> events) {
+        LocalDateTime start = LocalDateTime.of(1970, 1, 1, 0, 0);
+        LocalDateTime end = LocalDateTime.now();
+        Boolean unique = true;
+        List<String> uris = new ArrayList<>();
+        for (Event event : events) {
+            String uri = "/events/" + event.getId();
+            uris.add(uri);
+        }
+        List<ViewStatsResponseDto> statistics = statsClient.getStatistics(start, end, uris.toArray(String[]::new), unique);
+        if (statistics.isEmpty()) {
+            return Collections.emptyMap();
+        }
+        Map<String, Long> resultMap = statistics.stream()
+                .collect(Collectors.toMap(ViewStatsResponseDto::getUri, ViewStatsResponseDto::getHits, (a, b) -> b));
+
+        return resultMap;
+    }
+
+    private void addHit(HttpServletRequest request) {
         HitRequestDto hitDto = HitRequestDto.builder()
-                .app("ewm-service")
-                .uri(request.getRequestURI())
-                .ip(request.getRemoteAddr())
-                .timestamp(LocalDateTime.now()).build();
+                                            .app("ewm-main-service")
+                                            .uri(request.getRequestURI())
+                                            .ip(request.getRemoteAddr())
+                                            .timestamp(LocalDateTime.now()).build();
         statsClient.createStat(hitDto);
     }
 
     private void checkEventDateOrThrow(LocalDateTime eventTime, Long timeDiff) {
         LocalDateTime actualTime = LocalDateTime.now().plusHours(timeDiff);
         if (eventTime.isBefore(actualTime)) {
-            throw new ValidationException("Event date and time has to be in the future");
+            throw new CustomValidationException("Event date and time has to be in the future");
         }
     }
 
@@ -258,8 +288,7 @@ public class EventServiceImpl implements EventService {
     }
 
     public Event getOrThrow(Long eventId) {
-        return eventRepository.findById(eventId)
-                .orElseThrow(() -> new EntityNotFoundException(Event.class, String.format("ID: %s", eventId)));
+        return eventRepository.findById(eventId).orElseThrow(() -> new EntityNotFoundException(Event.class, String.format("ID: %s", eventId)));
     }
 
     private void checkEventInitiatorOrThrow(Event event, User user) {

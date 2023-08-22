@@ -27,7 +27,7 @@ public class StatsClient {
     private final RestTemplate rest;
     private final ObjectMapper objectMapper;
     private static final String POST_HIT_PATH = "/hit";
-    private static final String GET_STATS_PATH = "/stats?start={start}&end={end}&uris={uris}&unique={unique}";
+    private static final String GET_STATS_PATH_WITH_URIS = "/stats?start={start}&end={end}&uris={uris}&unique={unique}";
     private static final String GET_STATS_PATH_WITHOUT_URIS = "/stats?start={start}&end={end}&unique={unique}";
 
     @Autowired
@@ -39,8 +39,8 @@ public class StatsClient {
         this.objectMapper = objectMapper;
     }
 
-    public void createStat(HitRequestDto hitRequestDto) {
-        makeAndSendRequest(HttpMethod.POST, POST_HIT_PATH, null, hitRequestDto);
+    public ResponseEntity<Object> createStat(HitRequestDto hitRequestDto) {
+        return makeAndSendRequest(HttpMethod.POST, POST_HIT_PATH, null, hitRequestDto);
     }
 
     public List<ViewStatsResponseDto> getStatistics(LocalDateTime start,
@@ -59,7 +59,7 @@ public class StatsClient {
                     "uris", uris,
                     "unique", unique.toString());
 
-            statsServerResponse = makeAndSendRequest(HttpMethod.GET, GET_STATS_PATH, parameters, null);
+            statsServerResponse = makeAndSendRequest(HttpMethod.GET, GET_STATS_PATH_WITH_URIS, parameters, null);
         } else {
             parameters = Map.of(
                     "start", startTime,
@@ -91,7 +91,8 @@ public class StatsClient {
             return ResponseEntity.status(e.getStatusCode()).body(e.getResponseBodyAsByteArray());
         }
 
-        return prepareGatewayResponse(statsServerResponse);
+        //return prepareGatewayResponse(statsServerResponse);
+        return statsServerResponse;
     }
 
     private static ResponseEntity<Object> prepareGatewayResponse(ResponseEntity<Object> response) {

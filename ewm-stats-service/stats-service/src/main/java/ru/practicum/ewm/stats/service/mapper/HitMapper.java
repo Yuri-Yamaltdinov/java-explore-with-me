@@ -7,4 +7,6 @@ import ru.practicum.ewm.stats.service.model.Hit;
 @Mapper(componentModel = "spring")
 public interface HitMapper {
     Hit hitFromRequestDto(HitRequestDto hitRequestDto);
+
+    HitRequestDto hitToRequestDto(Hit hit);
 }

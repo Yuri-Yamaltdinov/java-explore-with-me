@@ -42,4 +42,6 @@ public interface EventRepository extends JpaRepository<Event, Long> {
             "GROUP BY e.id " +
             "ORDER BY e.id ASC")
     List<Event> findAllByParamsAdmin(List<Long> users, List<State> states, List<Long> categories, LocalDateTime rangeStart, LocalDateTime rangeEnd, Pagination page);
+
+    List<Event> findAllByCategoryId(Long categoryId);
 }

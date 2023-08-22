@@ -18,7 +18,6 @@ import java.util.List;
 @RestController
 @RequestMapping
 @RequiredArgsConstructor
-@Validated
 @Slf4j
 public class StatsController {
     public static final String DATE_TIME_PATTERN = "yyyy-MM-dd HH:mm:ss";
@@ -27,9 +26,9 @@ public class StatsController {
 
     @PostMapping("/hit")
     @ResponseStatus(HttpStatus.CREATED)
-    public void saveStat(@RequestBody @Valid HitRequestDto hitRequestDto) {
+    public HitRequestDto saveStat(@RequestBody @Valid HitRequestDto hitRequestDto) {
         log.info("Got request POST /hit, with {}", hitRequestDto);
-        statsService.createStat(hitRequestDto);
+        return statsService.createStat(hitRequestDto);
     }
 
     @GetMapping("/stats")

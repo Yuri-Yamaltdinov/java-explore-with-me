@@ -10,14 +10,28 @@ import ru.practicum.ewm.main.service.event.dto.EventShortDto;
 import ru.practicum.ewm.main.service.event.dto.NewEventDto;
 import ru.practicum.ewm.main.service.event.dto.UpdateEventUserRequest;
 import ru.practicum.ewm.main.service.event.model.Event;
+import ru.practicum.ewm.main.service.event.service.EventService;
 import ru.practicum.ewm.main.service.location.model.Location;
 import ru.practicum.ewm.main.service.user.dto.UserShortDto;
 import ru.practicum.ewm.main.service.user.model.User;
+import ru.practicum.ewm.stats.client.StatsClient;
+import ru.practicum.ewm.stats.dto.ViewStatsResponseDto;
+
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Mapper(componentModel = "spring")
 public abstract class EventMapper {
     @Autowired
     protected CategoryService categoryService;
+
+    protected EventService eventService;
+    @Autowired
+    protected StatsClient statsClient;
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "category",
@@ -48,4 +62,22 @@ public abstract class EventMapper {
     public abstract CategoryDto categoryDtoFromCategory(Category category);
 
     public abstract UserShortDto userShortDtoFromUser(User user);
+
+    public List<EventShortDto> eventShortDtoListFromListEvent(List<Event> events) {
+        if (events == null) {
+            return null;
+        }
+        if (events.isEmpty()) {
+            return Collections.emptyList();
+        }
+        Map<String, Long> statistics = eventService.getViewsFromStatServer(events);
+        List<EventShortDto> result = new ArrayList<>();
+        for (Event event : events) {
+            EventShortDto eventShortDto = eventShortDtoFromEvent(event, statistics.get("/events/" + event.getId()));
+            result.add(eventShortDto);
+        }
+
+        return result;
+    }
+
 }

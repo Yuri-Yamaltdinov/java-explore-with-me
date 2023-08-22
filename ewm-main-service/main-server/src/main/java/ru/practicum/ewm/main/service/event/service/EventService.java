@@ -10,6 +10,7 @@ import ru.practicum.ewm.main.service.event.model.State;
 import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 public interface EventService {
     EventFullDto create(Long userId, NewEventDto newEventDto);
@@ -25,6 +26,8 @@ public interface EventService {
     EventFullDto updateEvent(Long userId, Long eventId, UpdateEventUserRequest updateEventUserRequest);
 
     Event getOrThrow(Long eventId);
+
+    Map<String, Long> getViewsFromStatServer(List<Event> events);
 
     void increaseConfirmedRequests(Event event);
     void decreaseConfirmedRequests(Event event);

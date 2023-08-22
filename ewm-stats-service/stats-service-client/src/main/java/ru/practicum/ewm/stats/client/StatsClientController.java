@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.ewm.stats.dto.HitRequestDto;
@@ -29,9 +30,9 @@ public class StatsClientController {
 
     @PostMapping("/hit")
     @ResponseStatus(HttpStatus.CREATED)
-    public void saveStat(@RequestBody @Valid HitRequestDto hitRequestDto) {
+    public ResponseEntity<Object> saveStat(@RequestBody @Valid HitRequestDto hitRequestDto) {
         log.info("Got request POST /hit with {}", hitRequestDto);
-        statsClient.createStat(hitRequestDto);
+        return statsClient.createStat(hitRequestDto);
     }
 
     @GetMapping("/stats")

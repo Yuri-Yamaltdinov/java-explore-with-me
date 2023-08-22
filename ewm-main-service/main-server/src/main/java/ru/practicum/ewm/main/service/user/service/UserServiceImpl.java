@@ -6,7 +6,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import ru.practicum.ewm.main.service.exception.EntityNotFoundException;
-import ru.practicum.ewm.main.service.exception.ValidationException;
+import ru.practicum.ewm.main.service.exception.CustomValidationException;
 import ru.practicum.ewm.main.service.user.dto.UserDto;
 import ru.practicum.ewm.main.service.user.mapper.UserMapper;
 import ru.practicum.ewm.main.service.user.model.User;
@@ -28,7 +28,7 @@ public class UserServiceImpl implements UserService {
             User userSaved = userRepository.save(user);
             return userMapper.userToDto(userSaved);
         } catch (DataIntegrityViolationException e) {
-            throw new ValidationException("User with specified email is already exist.");
+            throw new CustomValidationException("User with specified email is already exist.");
         }
     }
 

@@ -29,7 +29,7 @@ public class CompilationControllerAdmin {
     }
 
     @DeleteMapping("/{compId}")
-    @ResponseStatus(HttpStatus.OK)
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable Long compId) {
         log.info("Got request to DELETE compilation id={}.", compId);
         compilationService.delete(compId);

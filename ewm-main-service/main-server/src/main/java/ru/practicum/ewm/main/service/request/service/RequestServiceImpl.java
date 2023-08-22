@@ -7,7 +7,7 @@ import ru.practicum.ewm.main.service.event.model.State;
 import ru.practicum.ewm.main.service.event.service.EventService;
 import ru.practicum.ewm.main.service.exception.AccessException;
 import ru.practicum.ewm.main.service.exception.EntityNotFoundException;
-import ru.practicum.ewm.main.service.exception.ValidationException;
+import ru.practicum.ewm.main.service.exception.CustomValidationException;
 import ru.practicum.ewm.main.service.request.dto.EventRequestStatusUpdateRequest;
 import ru.practicum.ewm.main.service.request.dto.EventRequestStatusUpdateResult;
 import ru.practicum.ewm.main.service.request.dto.ParticipationRequestDto;
@@ -42,7 +42,7 @@ public class RequestServiceImpl implements RequestService {
         Optional<ParticipationRequest> requestOptional = requestRepository.findByRequesterIdAndEventId(userId, eventId);
 
         if (requestOptional.isPresent()) {
-            throw new ValidationException("Request with specified User and Event is already exists.");
+            throw new CustomValidationException("Request with specified User and Event is already exists.");
         }
 
         User user = userService.getOrThrow(userId);
@@ -133,15 +133,15 @@ public class RequestServiceImpl implements RequestService {
 
     private void validateEventForUpdateRequestStatus(Event event, User user) {
         if (event.getConfirmedRequests() >= event.getParticipantLimit()) {
-            throw new ValidationException("Participation limit exceeded");
+            throw new CustomValidationException("Participation limit exceeded");
         }
 
         if (!event.getInitiator().equals(user)) {
-            throw new ValidationException(String.format("User %s is not the initiator of the event %s.", user.getId(), event.getId()));
+            throw new CustomValidationException(String.format("User %s is not the initiator of the event %s.", user.getId(), event.getId()));
         }
 
         if (event.getState().equals(State.PUBLISHED)) {
-            throw new ValidationException(String.format("Event %s has already been published, it is impossible to change it", event.getId()));
+            throw new CustomValidationException(String.format("Event %s has already been published, it is impossible to change it", event.getId()));
         }
     }
 
@@ -157,7 +157,7 @@ public class RequestServiceImpl implements RequestService {
 
         for (ParticipationRequest request : requests) {
             if (!request.getStatus().equals(PENDING)) {
-                throw new ValidationException("Request must have status PENDING");
+                throw new CustomValidationException("Request must have status PENDING");
             }
 
             if (status.equals(CONFIRMED) && vacantPlace > 0) {
