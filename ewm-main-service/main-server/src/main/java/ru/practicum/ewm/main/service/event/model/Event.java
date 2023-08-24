@@ -18,9 +18,11 @@ import static ru.practicum.ewm.main.service.event.model.State.PENDING;
 @Entity
 @Table(name = "events")
 @FieldDefaults(level = AccessLevel.PRIVATE)
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class Event {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @EqualsAndHashCode.Include
     private Long id;
 
     @Column(length = 2000, nullable = false)
