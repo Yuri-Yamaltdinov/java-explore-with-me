@@ -5,11 +5,11 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.validator.constraints.Length;
 import org.springframework.lang.Nullable;
 import ru.practicum.ewm.main.service.event.model.StateAction;
 import ru.practicum.ewm.main.service.location.dto.LocationDto;
 
+import javax.validation.constraints.Size;
 import java.time.LocalDateTime;
 
 import static ru.practicum.ewm.main.service.util.Constants.DATE_FORMAT;
@@ -21,7 +21,7 @@ import static ru.practicum.ewm.main.service.util.Constants.DATE_FORMAT;
 public class UpdateEventUserRequest {
 
     @Nullable
-    @Length(min = 20,
+    @Size(min = 20,
             max = 2000,
             message = "Annotation field size must be between 20 and 2000 characters.")
     private String annotation;
@@ -29,7 +29,7 @@ public class UpdateEventUserRequest {
     private Long category;
 
     @Nullable
-    @Length(min = 20,
+    @Size(min = 20,
             max = 7000,
             message = "Description field size must be between 20 and 7000 characters.")
     private String description;
@@ -49,7 +49,7 @@ public class UpdateEventUserRequest {
     private StateAction stateAction;
 
     @Nullable
-    @Length(min = 3,
+    @Size(min = 3,
             max = 120,
             message = "Title field size must be between 3 and 120 characters.")
     private String title;
