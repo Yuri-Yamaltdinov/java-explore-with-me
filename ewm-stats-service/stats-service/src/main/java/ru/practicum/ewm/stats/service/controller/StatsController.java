@@ -15,12 +15,13 @@ import javax.validation.Valid;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import static ru.practicum.ewm.stats.dto.util.Constants.DATE_FORMAT;
+
 @RestController
 @RequestMapping
 @RequiredArgsConstructor
 @Slf4j
 public class StatsController {
-    public static final String DATE_TIME_PATTERN = "yyyy-MM-dd HH:mm:ss";
     @Autowired
     private final StatsService statsService;
 
@@ -45,4 +46,5 @@ public class StatsController {
                 start, end, uris, unique);
         return statsService.getStats(start, end, uris, unique);
     }
+
 }
