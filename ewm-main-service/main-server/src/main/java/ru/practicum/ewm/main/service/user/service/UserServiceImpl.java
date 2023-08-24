@@ -2,8 +2,6 @@ package ru.practicum.ewm.main.service.user.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import ru.practicum.ewm.main.service.exception.ConflictException;
 import ru.practicum.ewm.main.service.exception.EntityNotFoundException;
@@ -11,6 +9,7 @@ import ru.practicum.ewm.main.service.user.dto.UserDto;
 import ru.practicum.ewm.main.service.user.mapper.UserMapper;
 import ru.practicum.ewm.main.service.user.model.User;
 import ru.practicum.ewm.main.service.user.repository.UserRepository;
+import ru.practicum.ewm.main.service.util.Pagination;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -35,7 +34,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<UserDto> getAllUsers(Long[] ids, Integer from, Integer size) {
-        Pageable page = PageRequest.of(from > 0 ? from / size : 0, size);
+        Pagination page = new Pagination(from, size);
 
         if (ids == null) {
             return userRepository.findAll(page)

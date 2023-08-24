@@ -2,8 +2,6 @@ package ru.practicum.ewm.main.service.category.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import ru.practicum.ewm.main.service.category.dto.CategoryDto;
 import ru.practicum.ewm.main.service.category.mapper.CategoryMapper;
@@ -13,6 +11,7 @@ import ru.practicum.ewm.main.service.event.model.Event;
 import ru.practicum.ewm.main.service.event.repository.EventRepository;
 import ru.practicum.ewm.main.service.exception.ConflictException;
 import ru.practicum.ewm.main.service.exception.EntityNotFoundException;
+import ru.practicum.ewm.main.service.util.Pagination;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -65,7 +64,7 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public List<CategoryDto> getAllCategories(Integer from, Integer size) {
-        Pageable page = PageRequest.of(from > 0 ? from / size : 0, size);
+        Pagination page = new Pagination(from, size);
 
         return categoryRepository.findAll(page)
                 .stream()
