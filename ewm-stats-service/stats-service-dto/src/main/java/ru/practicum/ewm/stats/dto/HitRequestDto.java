@@ -9,17 +9,19 @@ import lombok.NoArgsConstructor;
 import javax.validation.constraints.NotBlank;
 import java.time.LocalDateTime;
 
+import static ru.practicum.ewm.stats.dto.util.Constants.DATE_FORMAT;
+
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class HitRequestDto {
     @NotBlank(message = "Field app must be filled.")
-    String app;
+    private String app;
     @NotBlank(message = "Field uri must be filled.")
-    String uri;
+    private String uri;
     @NotBlank(message = "Field ip must be filled.")
-    String ip;
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    LocalDateTime timestamp;
+    private String ip;
+    @JsonFormat(pattern = DATE_FORMAT)
+    private LocalDateTime timestamp;
 }
