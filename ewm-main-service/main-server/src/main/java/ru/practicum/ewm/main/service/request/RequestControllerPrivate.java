@@ -10,6 +10,7 @@ import ru.practicum.ewm.main.service.request.dto.EventRequestStatusUpdateResult;
 import ru.practicum.ewm.main.service.request.dto.ParticipationRequestDto;
 import ru.practicum.ewm.main.service.request.service.RequestService;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -56,7 +57,7 @@ public class RequestControllerPrivate {
     @ResponseStatus(HttpStatus.OK)
     public EventRequestStatusUpdateResult updateRequestStatus(@PathVariable Long userId,
                                                               @PathVariable Long eventId,
-                                                              @RequestBody EventRequestStatusUpdateRequest requests) {
+                                                              @RequestBody @Valid EventRequestStatusUpdateRequest requests) {
         log.info("Update participation requests size={} by eventId={}, userId={}", requests.getRequestIds().size(), eventId, userId);
         return requestService.updateRequestStatus(userId, eventId, requests);
     }
