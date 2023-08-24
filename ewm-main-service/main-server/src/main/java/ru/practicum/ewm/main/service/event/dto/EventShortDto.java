@@ -14,8 +14,8 @@ import static ru.practicum.ewm.main.service.util.Constants.DATE_FORMAT;
 
 @Data
 @Builder
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 public class EventShortDto {
 
     private String annotation;

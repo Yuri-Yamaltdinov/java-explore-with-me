@@ -7,8 +7,8 @@ import javax.persistence.*;
 
 @Data
 @Builder
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(name = "locations")
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)

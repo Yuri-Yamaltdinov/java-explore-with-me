@@ -13,8 +13,8 @@ import static ru.practicum.ewm.main.service.event.model.State.PENDING;
 
 @Data
 @Builder
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(name = "events")
 @FieldDefaults(level = AccessLevel.PRIVATE)

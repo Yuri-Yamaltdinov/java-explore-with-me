@@ -9,8 +9,8 @@ import java.util.List;
 
 @Data
 @Builder
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(name = "compilations")
 @FieldDefaults(level = AccessLevel.PRIVATE)
