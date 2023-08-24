@@ -17,6 +17,9 @@ public class UserDto {
     private Long id;
 
     @NotBlank(message = "Must not be blank.")
+    @Size(min = 2,
+            max = 250,
+            message = "Name field size must be between 2 and 250 characters.")
     private String name;
 
     @NotBlank(message = "Must not be blank.")
