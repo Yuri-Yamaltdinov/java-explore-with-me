@@ -116,7 +116,7 @@ public class RequestServiceImpl implements RequestService {
 
         validateEventForUpdateRequestStatus(event, user);
 
-        if (event.getRequestModeration() || event.getParticipantLimit() == 0) {
+        if (!event.getRequestModeration() || event.getParticipantLimit() == 0) {
             return result;
         }
 

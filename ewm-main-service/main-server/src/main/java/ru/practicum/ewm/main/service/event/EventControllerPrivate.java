@@ -60,12 +60,4 @@ public class EventControllerPrivate {
         return eventService.updateEvent(userId, eventId, updateEventUserRequest);
     }
 
-/*    @PatchMapping("/{eventId}")
-    @ResponseStatus(HttpStatus.OK)
-    public EventFullDto createEvent(@PathVariable Long userId,
-                                    @PathVariable Long eventId,
-                                    @RequestBody String updateEventUserRequest) {
-        log.info("Got PATCH request");
-        return null;
-    }*/
 }

@@ -18,7 +18,7 @@ public class CompilationUpdateDto {
     Boolean pinned;
 
     @Size(min = 1,
-            max = 20,
-            message = "Title length must be between 1 and 20 characters.")
+            max = 50,
+            message = "Title length must be between 1 and 50 characters.")
     String title;
 }

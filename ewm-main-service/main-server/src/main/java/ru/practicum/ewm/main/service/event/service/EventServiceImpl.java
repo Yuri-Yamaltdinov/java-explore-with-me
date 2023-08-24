@@ -89,12 +89,13 @@ public class EventServiceImpl implements EventService {
             return Collections.emptySet();
         }
         List<Event> events = eventRepository.findAllById(ids);
+        Map<String, Long> statistics = getViewsFromStatServer(events);
         List<EventShortDto> result = new ArrayList<>();
-
         for (Event event : events) {
-            Long views = getViewsFromStatServer(event);
-            result.add(eventMapper.eventShortDtoFromEvent(event, views));
+            EventShortDto eventShortDto = eventMapper.eventShortDtoFromEvent(event, statistics.get("/events/" + event.getId()));
+            result.add(eventShortDto);
         }
+
         return new HashSet<>(result);
     }
 
@@ -111,9 +112,17 @@ public class EventServiceImpl implements EventService {
         User user = userService.getOrThrow(userId);
         Event event = getOrThrow(eventId);
         checkEventInitiatorOrThrow(event, user);
-        Long views = getViewsFromStatServer(event);
+        //Long views = getViewsFromStatServer(event);
+        String uri = "/events/" + event.getId();
+        Map<String, Long> result = getViewsFromStatServer(List.of(event));
+        Long views = result.get(uri);
 
         return eventMapper.eventFullDtoFromEvent(event, views);
+    }
+
+    @Override
+    public void updateEvent(Event event) {
+        eventRepository.saveAndFlush(event);
     }
 
     @Override
@@ -177,7 +186,11 @@ public class EventServiceImpl implements EventService {
         if (updateEventUserRequest.getEventDate() != null) {
             checkEventDateOrThrow(updateEventUserRequest.getEventDate(), timeDiff);
         }
-        Long views = getViewsFromStatServer(event);
+        //Long views = getViewsFromStatServer(event);
+        String uri = "/events/" + event.getId();
+        Map<String, Long> result = getViewsFromStatServer(List.of(event));
+        Long views = result.get(uri);
+
         eventMapper.updateEventFromURDto(event, updateEventUserRequest);
         return eventMapper.eventFullDtoFromEvent(eventRepository.save(event), views);
     }
@@ -190,18 +203,17 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    public void updateEvent(Event event) {
-        eventRepository.saveAndFlush(event);
-    }
-
-    @Override
     public EventFullDto getEventPublic(Long eventId, HttpServletRequest request) {
         Event event = getOrThrow(eventId);
         if (!event.getState().equals(PUBLISHED)) {
             throw new EntityNotFoundException(Event.class, "Event is not PUBLISHED.");
         }
-        Long views = getViewsFromStatServer(event);
         addHit(request);
+        //Long views = getViewsFromStatServer(event);
+        String uri = "/events/" + event.getId();
+        Map<String, Long> result = getViewsFromStatServer(List.of(event));
+        Long views = result.get(uri);
+
         return eventMapper.eventFullDtoFromEvent(event, views);
     }
 
@@ -287,9 +299,25 @@ public class EventServiceImpl implements EventService {
         return resultMap;
     }
 
+    private Long getViewsFromStatServer(Event event) {
+        LocalDateTime start = LocalDateTime.MIN;
+        LocalDateTime end = LocalDateTime.MAX;
+        String uri = String.format("/events/%d", event.getId());
+        String[] uris = {uri};
+        Boolean unique = false;
+
+        List<ViewStatsResponseDto> statistics = statsClient.getStatistics(start, end, uris, unique);
+
+        if (statistics.isEmpty()) {
+            return 0L;
+        } else {
+            return statistics.get(0).getHits();
+        }
+    }
+
     private void addHit(HttpServletRequest request) {
         HitRequestDto hitRequestDto = HitRequestDto.builder()
-                .app("ewm-main-service")
+                .app("ewm-service")
                 .uri(request.getRequestURI())
                 .ip(request.getRemoteAddr())
                 .timestamp(LocalDateTime.now()).build();
@@ -306,22 +334,6 @@ public class EventServiceImpl implements EventService {
         LocalDateTime actualTime = LocalDateTime.now().plusHours(timeDiff);
         if (eventTime.isBefore(actualTime)) {
             throw new CustomValidationException("Event date and time has to be in the future");
-        }
-    }
-
-    private Long getViewsFromStatServer(Event event) {
-        LocalDateTime start = LocalDateTime.MIN;
-        LocalDateTime end = LocalDateTime.MAX;
-        String uri = String.format("/events/%d", event.getId());
-        String[] uris = {uri};
-        Boolean unique = false;
-
-        List<ViewStatsResponseDto> statistics = statsClient.getStatistics(start, end, uris, unique);
-
-        if (statistics.isEmpty()) {
-            return 0L;
-        } else {
-            return statistics.get(0).getHits();
         }
     }
 
