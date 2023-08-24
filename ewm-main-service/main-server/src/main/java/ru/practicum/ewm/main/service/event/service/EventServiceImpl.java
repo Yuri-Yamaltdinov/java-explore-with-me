@@ -1,6 +1,7 @@
 package ru.practicum.ewm.main.service.event.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import ru.practicum.ewm.main.service.event.dto.EventFullDto;
@@ -34,6 +35,7 @@ import static ru.practicum.ewm.main.service.event.model.State.*;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class EventServiceImpl implements EventService {
 
     private final StatsClient statsClient;
@@ -201,8 +203,10 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    public List<EventShortDto> getAllEventsPublic(String text, List<Long> categories,
-                                                  Boolean paid, LocalDateTime rangeStart,
+    public List<EventShortDto> getAllEventsPublic(String text,
+                                                  List<Long> categories,
+                                                  Boolean paid,
+                                                  LocalDateTime rangeStart,
                                                   LocalDateTime rangeEnd,
                                                   Boolean onlyAvailable,
                                                   String sort,
@@ -215,7 +219,13 @@ public class EventServiceImpl implements EventService {
         Pagination page = new Pagination(from, size);
         List<Event> events = eventRepository
                             .findAllByParamsPublic(text, categories, paid, rangeStart, rangeEnd, onlyAvailable, page);
-        List<EventShortDto> result = eventMapper.eventShortDtoListFromListEvent(events);
+        //List<EventShortDto> result = eventMapper.eventShortDtoListFromListEvent(events);
+        List<EventShortDto> result = new ArrayList<>();
+        Map<String, Long> statistics = getViewsFromStatServer(events);
+
+        for (Event event : events) {
+            result.add(eventMapper.eventShortDtoFromEvent(event, statistics.get("/events/" + event.getId())));
+        }
 
         if (sort != null) {
             SortValues sortValue = SortValues.from(sort).orElseThrow(() ->
@@ -276,12 +286,18 @@ public class EventServiceImpl implements EventService {
     }
 
     private void addHit(HttpServletRequest request) {
-        HitRequestDto hitDto = HitRequestDto.builder()
+        HitRequestDto hitRequestDto = HitRequestDto.builder()
                 .app("ewm-main-service")
                 .uri(request.getRequestURI())
                 .ip(request.getRemoteAddr())
                 .timestamp(LocalDateTime.now()).build();
-        statsClient.createStat(hitDto);
+
+        try {
+            statsClient.createStat(hitRequestDto);
+            log.info("Create stat uri={}", hitRequestDto.getUri());
+        } catch (RuntimeException e) {
+            log.warn("Attempt to duplicate statistics. " + e.getMessage());
+        }
     }
 
     private void checkEventDateOrThrow(LocalDateTime eventTime, Long timeDiff) {

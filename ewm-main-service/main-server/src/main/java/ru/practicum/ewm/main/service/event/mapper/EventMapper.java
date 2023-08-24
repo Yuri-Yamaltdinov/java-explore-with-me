@@ -1,6 +1,8 @@
 package ru.practicum.ewm.main.service.event.mapper;
 
-import org.mapstruct.*;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.Named;
 import org.springframework.beans.factory.annotation.Autowired;
 import ru.practicum.ewm.main.service.category.dto.CategoryDto;
 import ru.practicum.ewm.main.service.category.model.Category;
@@ -17,11 +19,6 @@ import ru.practicum.ewm.main.service.location.repository.LocationRepository;
 import ru.practicum.ewm.main.service.user.dto.UserShortDto;
 import ru.practicum.ewm.main.service.user.model.User;
 import ru.practicum.ewm.stats.client.StatsClient;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
 
 @Mapper(componentModel = "spring")
 public abstract class EventMapper {
@@ -142,7 +139,7 @@ public abstract class EventMapper {
 
     protected abstract LocationDto locationToLocationDto(Location location);
 
-    public List<EventShortDto> eventShortDtoListFromListEvent(List<Event> events) {
+/*    public List<EventShortDto> eventShortDtoListFromListEvent(List<Event> events) {
         if (events == null) {
             return null;
         }
@@ -157,6 +154,6 @@ public abstract class EventMapper {
         }
 
         return result;
-    }
+    }*/
 
 }
