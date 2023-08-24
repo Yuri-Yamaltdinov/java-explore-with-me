@@ -14,11 +14,8 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 import org.springframework.web.servlet.NoHandlerFoundException;
 import ru.practicum.ewm.main.service.exception.AccessException;
 import ru.practicum.ewm.main.service.exception.ConflictException;
-import ru.practicum.ewm.main.service.exception.EntityNotFoundException;
 import ru.practicum.ewm.main.service.exception.CustomValidationException;
-
-import javax.validation.ConstraintViolationException;
-import javax.validation.ValidationException;
+import ru.practicum.ewm.main.service.exception.EntityNotFoundException;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
@@ -39,7 +36,7 @@ public class ErrorHandler {
                 .build();
     }
 
-    @ExceptionHandler
+/*    @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ApiError handleValidationException(final ValidationException e) {
         log.error(e.getMessage(), e);
@@ -49,7 +46,7 @@ public class ErrorHandler {
                 .message(e.getMessage())
                 .timestamp(LocalDateTime.now())
                 .build();
-    }
+    }*/
 
     @ExceptionHandler(MissingRequestHeaderException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
@@ -79,8 +76,6 @@ public class ErrorHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ApiError handlerMethodArgumentNotValidException(MethodArgumentNotValidException e) {
         log.error("400 — Method Argument Not Valid");
-        //return new ErrorResponse(MethodArgumentNotValidException.class,
-        //        e.getFieldError().getDefaultMessage());
         return ApiError.builder()
                 .status(HttpStatus.BAD_REQUEST)
                 .reason("Incorrectly made request.")
@@ -103,7 +98,7 @@ public class ErrorHandler {
                 .build();
     }
 
-    @ExceptionHandler(ConstraintViolationException.class)
+/*    @ExceptionHandler(ConstraintViolationException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ApiError handleHibernateViolationException(ConstraintViolationException e) {
         log.error("400 — Constraint Violation");
@@ -113,7 +108,7 @@ public class ErrorHandler {
                 .message(e.getMessage())
                 .timestamp(LocalDateTime.now())
                 .build();
-    }
+    }*/
 
     @ExceptionHandler(EntityNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
