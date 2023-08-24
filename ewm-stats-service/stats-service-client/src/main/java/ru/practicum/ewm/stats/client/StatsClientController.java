@@ -1,25 +1,6 @@
 package ru.practicum.ewm.stats.client;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
-import ru.practicum.ewm.stats.dto.HitRequestDto;
-import ru.practicum.ewm.stats.dto.ViewStatsResponseDto;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
-import java.net.URLDecoder;
-import java.time.LocalDateTime;
-import java.util.List;
-
-import static java.nio.charset.StandardCharsets.UTF_8;
-import static ru.practicum.ewm.stats.dto.util.Constants.FORMATTER;
-
-@RestController
+/*@RestController
 @RequestMapping
 @RequiredArgsConstructor
 @Validated
@@ -30,9 +11,9 @@ public class StatsClientController {
 
     @PostMapping("/hit")
     @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<Object> saveStat(@RequestBody @Valid HitRequestDto hitRequestDto) {
+    public void saveStat(@RequestBody @Valid HitRequestDto hitRequestDto) {
         log.info("Got request POST /hit with {}", hitRequestDto);
-        return statsClient.createStat(hitRequestDto);
+        statsClient.createStat(hitRequestDto);
     }
 
     @GetMapping("/stats")
@@ -49,4 +30,4 @@ public class StatsClientController {
         return statsClient.getStatistics(startTime, endTime, uris, unique);
     }
 
-}
+}*/

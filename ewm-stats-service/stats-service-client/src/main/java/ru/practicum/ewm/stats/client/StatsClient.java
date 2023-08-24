@@ -39,8 +39,8 @@ public class StatsClient {
         this.objectMapper = objectMapper;
     }
 
-    public ResponseEntity<Object> createStat(HitRequestDto hitRequestDto) {
-        return makeAndSendRequest(HttpMethod.POST, POST_HIT_PATH, null, hitRequestDto);
+    public void createStat(HitRequestDto hitRequestDto) {
+        makeAndSendRequest(HttpMethod.POST, POST_HIT_PATH, null, hitRequestDto);
     }
 
     public List<ViewStatsResponseDto> getStatistics(LocalDateTime start,

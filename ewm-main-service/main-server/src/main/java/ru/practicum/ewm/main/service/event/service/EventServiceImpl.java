@@ -11,9 +11,8 @@ import ru.practicum.ewm.main.service.event.mapper.EventMapper;
 import ru.practicum.ewm.main.service.event.model.Event;
 import ru.practicum.ewm.main.service.event.model.SortValues;
 import ru.practicum.ewm.main.service.event.model.State;
-import ru.practicum.ewm.main.service.event.model.StateAction;
 import ru.practicum.ewm.main.service.event.repository.EventRepository;
-import ru.practicum.ewm.main.service.exception.AccessException;
+import ru.practicum.ewm.main.service.exception.ConflictException;
 import ru.practicum.ewm.main.service.exception.CustomValidationException;
 import ru.practicum.ewm.main.service.exception.EntityNotFoundException;
 import ru.practicum.ewm.main.service.location.mapper.LocationMapper;
@@ -67,12 +66,18 @@ public class EventServiceImpl implements EventService {
         User user = userService.getOrThrow(userId);
         Pagination page = new Pagination(from, size);
         List<Event> events = eventRepository.findAllByInitiator(user, page);
+        if (events == null) {
+            return null;
+        }
+        if (events.isEmpty()) {
+            return Collections.emptyList();
+        }
+        Map<String, Long> statistics = getViewsFromStatServer(events);
         List<EventShortDto> result = new ArrayList<>();
         for (Event event : events) {
-            Long views = getViewsFromStatServer(event);
-            result.add(eventMapper.eventShortDtoFromEvent(event, views));
+            EventShortDto eventShortDto = eventMapper.eventShortDtoFromEvent(event, statistics.get("/events/" + event.getId()));
+            result.add(eventShortDto);
         }
-
         return result;
     }
 
@@ -113,15 +118,62 @@ public class EventServiceImpl implements EventService {
         Long timeDiff = 2L;
         checkEventInitiatorOrThrow(event, user);
         if (event.getState().equals(PUBLISHED)) {
-            throw new AccessException("Event is already published");
+            throw new ConflictException("Event is already published");
         }
         if (updateEventUserRequest.getEventDate() != null) {
             checkEventDateOrThrow(updateEventUserRequest.getEventDate(), timeDiff);
         }
-        Long views = getViewsFromStatServer(event);
-        Location location = locationRepository.save(locationMapper.locationFromDto(updateEventUserRequest.getLocation()));
+        if (updateEventUserRequest.getStateAction() != null) {
+            switch (updateEventUserRequest.getStateAction()) {
+                case SEND_TO_REVIEW:
+                    event.setState(PENDING);
+                    break;
+                case CANCEL_REVIEW:
+                    event.setState(CANCELED);
+                    break;
+            }
+        }
 
-        eventMapper.updateEventFromDto(event, updateEventUserRequest, location);
+        eventMapper.updateEventFromURDto(event, updateEventUserRequest);
+
+        String uri = "/events/" + event.getId();
+        Map<String, Long> result = getViewsFromStatServer(List.of(event));
+        Long views = result.get(uri);
+
+        return eventMapper.eventFullDtoFromEvent(eventRepository.save(event), views);
+
+    }
+
+    @Override
+    public EventFullDto updateEventAdmin(Long eventId, UpdateEventUserRequest updateEventUserRequest) {
+        Event event = getOrThrow(eventId);
+        Long timeDiff = 1L;
+
+        if (updateEventUserRequest.getStateAction() != null) {
+            switch (updateEventUserRequest.getStateAction()) {
+                case PUBLISH_EVENT:
+                    if (event.getState().equals(PENDING)) {
+                        event.setState(PUBLISHED);
+                        event.setPublishedOn(LocalDateTime.now());
+                    } else {
+                        throw new ConflictException("Event status is not PENDING. Event can't be PUBLISHED.");
+                    }
+                    break;
+                case REJECT_EVENT:
+                    if (!event.getState().equals(PUBLISHED)) {
+                        event.setState(CANCELED);
+                    } else {
+                        throw new ConflictException("Event status is PUBLISHED. Event can't be CANCELED.");
+                    }
+                    break;
+            }
+        }
+
+        if (updateEventUserRequest.getEventDate() != null) {
+            checkEventDateOrThrow(updateEventUserRequest.getEventDate(), timeDiff);
+        }
+        Long views = getViewsFromStatServer(event);
+        eventMapper.updateEventFromURDto(event, updateEventUserRequest);
         return eventMapper.eventFullDtoFromEvent(eventRepository.save(event), views);
     }
 
@@ -162,12 +214,12 @@ public class EventServiceImpl implements EventService {
         }
         Pagination page = new Pagination(from, size);
         List<Event> events = eventRepository.
-                            findAllByParamsPublic(text, categories, paid, rangeStart, rangeEnd, onlyAvailable, page);
+                findAllByParamsPublic(text, categories, paid, rangeStart, rangeEnd, onlyAvailable, page);
         List<EventShortDto> result = eventMapper.eventShortDtoListFromListEvent(events);
 
         if (sort != null) {
             SortValues sortValue = SortValues.from(sort).orElseThrow(() ->
-                            new CustomValidationException(String.format("Unsupported status = %s", sort)));
+                    new CustomValidationException(String.format("Unsupported status = %s", sort)));
             switch (sortValue) {
                 case VIEWS:
                     result.sort((o1, o2) -> (int) (o1.getViews() - o2.getViews()));
@@ -204,32 +256,6 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    public EventFullDto updateEventAdmin(Long eventId, UpdateEventUserRequest updateEventUserRequest) {
-        Event event = getOrThrow(eventId);
-        Long timeDiff = 1L;
-        if (updateEventUserRequest.getStateAction().equals(StateAction.PUBLISH_EVENT) && event.getState().equals(PENDING)) {
-            event.setState(PUBLISHED);
-        } else {
-            throw new AccessException("Event status is not PENDING. Event can't be PUBLISHED.");
-        }
-
-        if (updateEventUserRequest.getStateAction().equals(StateAction.REJECT_EVENT) && !event.getState().equals(PUBLISHED)) {
-            event.setState(CANCELED);
-        } else {
-            throw new AccessException("Event status is PUBLISHED. Event can't be CANCELED.");
-        }
-
-        if (updateEventUserRequest.getEventDate() != null) {
-            checkEventDateOrThrow(updateEventUserRequest.getEventDate(), timeDiff);
-        }
-        Long views = getViewsFromStatServer(event);
-        Location location = locationRepository.save(locationMapper.locationFromDto(updateEventUserRequest.getLocation()));
-
-        eventMapper.updateEventFromDto(event, updateEventUserRequest, location);
-        return eventMapper.eventFullDtoFromEvent(eventRepository.save(event), views);
-    }
-
-    @Override
     public Map<String, Long> getViewsFromStatServer(List<Event> events) {
         LocalDateTime start = LocalDateTime.of(1970, 1, 1, 0, 0);
         LocalDateTime end = LocalDateTime.now();
@@ -251,10 +277,10 @@ public class EventServiceImpl implements EventService {
 
     private void addHit(HttpServletRequest request) {
         HitRequestDto hitDto = HitRequestDto.builder()
-                                            .app("ewm-main-service")
-                                            .uri(request.getRequestURI())
-                                            .ip(request.getRemoteAddr())
-                                            .timestamp(LocalDateTime.now()).build();
+                .app("ewm-main-service")
+                .uri(request.getRequestURI())
+                .ip(request.getRemoteAddr())
+                .timestamp(LocalDateTime.now()).build();
         statsClient.createStat(hitDto);
     }
 
@@ -293,7 +319,7 @@ public class EventServiceImpl implements EventService {
 
     private void checkEventInitiatorOrThrow(Event event, User user) {
         if (!event.getInitiator().equals(user)) {
-            throw new AccessException("User not initiator for event");
+            throw new ConflictException("User not initiator for event");
         }
     }
 }

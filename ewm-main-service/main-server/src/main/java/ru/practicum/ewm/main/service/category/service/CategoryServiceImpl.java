@@ -13,7 +13,6 @@ import ru.practicum.ewm.main.service.event.model.Event;
 import ru.practicum.ewm.main.service.event.repository.EventRepository;
 import ru.practicum.ewm.main.service.exception.ConflictException;
 import ru.practicum.ewm.main.service.exception.EntityNotFoundException;
-import ru.practicum.ewm.main.service.exception.CustomValidationException;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -46,7 +45,7 @@ public class CategoryServiceImpl implements CategoryService {
             Category categorySaved = categoryRepository.save(category);
             return categoryMapper.categoryToDto(categorySaved);
         } catch (DataIntegrityViolationException e) {
-            throw new CustomValidationException("Category with specified name is already exists.");
+            throw new ConflictException("Category with specified name is already exists.");
         }
     }
 
@@ -54,7 +53,14 @@ public class CategoryServiceImpl implements CategoryService {
     public CategoryDto update(Long catId, CategoryDto categoryDto) {
         Category category = getOrThrow(catId);
         categoryMapper.updateCategoryFromDto(categoryDto, category);
-        return categoryMapper.categoryToDto(categoryRepository.saveAndFlush(category));
+
+        try {
+            category = categoryRepository.saveAndFlush(category);
+        } catch (RuntimeException e) {
+            throw new ConflictException(e.getMessage());
+        }
+
+        return categoryMapper.categoryToDto(category);
     }
 
     @Override

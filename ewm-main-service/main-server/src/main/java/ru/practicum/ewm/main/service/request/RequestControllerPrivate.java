@@ -13,7 +13,7 @@ import ru.practicum.ewm.main.service.request.service.RequestService;
 import java.util.List;
 
 @RestController
-@RequestMapping
+@RequestMapping("/users/{userId}")
 @RequiredArgsConstructor
 @Validated
 @Slf4j
@@ -21,7 +21,7 @@ public class RequestControllerPrivate {
 
     private final RequestService requestService;
 
-    @PostMapping("/users/{userId}/requests")
+    @PostMapping("/requests")
     @ResponseStatus(HttpStatus.CREATED)
     public ParticipationRequestDto createRequest(@PathVariable Long userId,
                                                  @RequestParam Long eventId) {
@@ -29,14 +29,14 @@ public class RequestControllerPrivate {
         return requestService.create(userId, eventId);
     }
 
-    @GetMapping("/users/{userId}/requests")
+    @GetMapping("/requests")
     @ResponseStatus(HttpStatus.OK)
     public List<ParticipationRequestDto> getRequestsByUser(@PathVariable Long userId) {
         log.info("Get participation request by userId={}", userId);
         return requestService.getRequestsByRequester(userId);
     }
 
-    @PatchMapping("/users/{userId}/requests/{requestId}/cancel")
+    @PatchMapping("/requests/{requestId}/cancel")
     @ResponseStatus(HttpStatus.OK)
     public ParticipationRequestDto cancelRequest(@PathVariable Long userId,
                                                  @RequestParam Long requestId) {
@@ -44,7 +44,7 @@ public class RequestControllerPrivate {
         return requestService.cancelRequest(userId, requestId);
     }
 
-    @GetMapping("/users/{userId}/events/{eventId}/requests")
+    @GetMapping("/events/{eventId}/requests")
     @ResponseStatus(HttpStatus.OK)
     public List<ParticipationRequestDto> getRequestsForEvent(@PathVariable Long userId,
                                                              @PathVariable Long eventId) {
@@ -52,7 +52,7 @@ public class RequestControllerPrivate {
         return requestService.getRequestsForEvent(userId, eventId);
     }
 
-    @PatchMapping("/users/{userId}/events/{eventId}/requests")
+    @PatchMapping("/events/{eventId}/requests")
     @ResponseStatus(HttpStatus.OK)
     public EventRequestStatusUpdateResult updateRequestStatus(@PathVariable Long userId,
                                                               @PathVariable Long eventId,

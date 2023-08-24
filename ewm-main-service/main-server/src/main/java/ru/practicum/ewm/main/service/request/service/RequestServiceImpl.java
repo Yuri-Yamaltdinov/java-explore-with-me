@@ -5,9 +5,8 @@ import org.springframework.stereotype.Service;
 import ru.practicum.ewm.main.service.event.model.Event;
 import ru.practicum.ewm.main.service.event.model.State;
 import ru.practicum.ewm.main.service.event.service.EventService;
-import ru.practicum.ewm.main.service.exception.AccessException;
+import ru.practicum.ewm.main.service.exception.ConflictException;
 import ru.practicum.ewm.main.service.exception.EntityNotFoundException;
-import ru.practicum.ewm.main.service.exception.CustomValidationException;
 import ru.practicum.ewm.main.service.request.dto.EventRequestStatusUpdateRequest;
 import ru.practicum.ewm.main.service.request.dto.EventRequestStatusUpdateResult;
 import ru.practicum.ewm.main.service.request.dto.ParticipationRequestDto;
@@ -27,14 +26,13 @@ import java.util.stream.Collectors;
 
 import static ru.practicum.ewm.main.service.request.model.RequestStatus.*;
 
-
 @Service
 @RequiredArgsConstructor
 public class RequestServiceImpl implements RequestService {
 
-    private final RequestRepository requestRepository;
     private final UserService userService;
     private final EventService eventService;
+    private final RequestRepository requestRepository;
     private final ParticipationRequestMapper requestMapper;
 
     @Override
@@ -42,29 +40,32 @@ public class RequestServiceImpl implements RequestService {
         Optional<ParticipationRequest> requestOptional = requestRepository.findByRequesterIdAndEventId(userId, eventId);
 
         if (requestOptional.isPresent()) {
-            throw new CustomValidationException("Request with specified User and Event is already exists.");
+            throw new ConflictException("Request with specified User and Event is already exists.");
         }
 
         User user = userService.getOrThrow(userId);
         Event event = eventService.getOrThrow(eventId);
         if (event.getInitiator().equals(user) ||
-                !event.getState().equals(State.PUBLISHED) ||
-                event.getConfirmedRequests() >= event.getParticipantLimit()) {
-            throw new AccessException("Integrity constraint violation");
+                !event.getState().equals(State.PUBLISHED)) {
+            throw new ConflictException("Integrity constraint violation");
         }
+
+        if (event.getConfirmedRequests() >= event.getParticipantLimit()
+                && event.getParticipantLimit() > 0) {
+            throw new ConflictException("Integrity constraint violation");
+        }
+
         ParticipationRequest request = ParticipationRequest.builder()
                 .created(LocalDateTime.now())
                 .requester(user)
                 .event(event).build();
-        if (event.getRequestModeration() &&
-                event.getParticipantLimit() > 0) {
-            request.setStatus(PENDING);
-        } else {
+        if (!event.getRequestModeration() || event.getParticipantLimit() == 0) {
             request.setStatus(CONFIRMED);
+            eventService.increaseConfirmedRequests(event);
+        } else {
+            request.setStatus(PENDING);
         }
-
         ParticipationRequestDto requestDto = requestMapper.requestToDto(requestRepository.saveAndFlush(request));
-        eventService.increaseConfirmedRequests(event);
         return requestDto;
     }
 
@@ -96,7 +97,7 @@ public class RequestServiceImpl implements RequestService {
         User user = userService.getOrThrow(userId);
         Event event = eventService.getOrThrow(eventId);
         if (!event.getInitiator().equals(user)) {
-            throw new AccessException("Integrity constraint has been violated");
+            throw new ConflictException("Integrity constraint has been violated");
         }
 
         List<ParticipationRequest> requests = requestRepository.findAllByEventId(eventId);
@@ -133,16 +134,13 @@ public class RequestServiceImpl implements RequestService {
 
     private void validateEventForUpdateRequestStatus(Event event, User user) {
         if (event.getConfirmedRequests() >= event.getParticipantLimit()) {
-            throw new CustomValidationException("Participation limit exceeded");
+            throw new ConflictException("Participation limit exceeded");
         }
 
         if (!event.getInitiator().equals(user)) {
-            throw new CustomValidationException(String.format("User %s is not the initiator of the event %s.", user.getId(), event.getId()));
+            throw new ConflictException(String.format("User %s is not the initiator of the event %s.", user.getId(), event.getId()));
         }
 
-        if (event.getState().equals(State.PUBLISHED)) {
-            throw new CustomValidationException(String.format("Event %s has already been published, it is impossible to change it", event.getId()));
-        }
     }
 
     private EventRequestStatusUpdateResult updateStatus(List<ParticipationRequest> requests, RequestStatus status, Event event) {
@@ -157,7 +155,7 @@ public class RequestServiceImpl implements RequestService {
 
         for (ParticipationRequest request : requests) {
             if (!request.getStatus().equals(PENDING)) {
-                throw new CustomValidationException("Request must have status PENDING");
+                throw new ConflictException("Request must have status PENDING");
             }
 
             if (status.equals(CONFIRMED) && vacantPlace > 0) {
