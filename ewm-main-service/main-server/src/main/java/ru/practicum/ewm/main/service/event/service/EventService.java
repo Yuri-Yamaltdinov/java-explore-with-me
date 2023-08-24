@@ -11,15 +11,16 @@ import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public interface EventService {
     EventFullDto create(Long userId, NewEventDto newEventDto);
 
     List<EventShortDto> getAll(Long userId, Integer from, Integer size);
 
-    List<EventShortDto> getAllShortDto(List<Long> ids);
+    Set<EventShortDto> getAllShortDto(Set<Long> ids);
 
-    List<Event> getAll(List<Long> ids);
+    Set<Event> getAll(Set<Long> ids);
 
     EventFullDto getEvent(Long userId, Long eventId);
 

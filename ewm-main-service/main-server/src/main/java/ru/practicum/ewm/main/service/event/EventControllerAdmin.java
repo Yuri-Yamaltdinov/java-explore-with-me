@@ -36,7 +36,9 @@ public class EventControllerAdmin {
                                      @RequestParam(required = false) String rangeEnd,
                                      @PositiveOrZero @RequestParam(defaultValue = "0") Integer from,
                                      @Positive @RequestParam(defaultValue = "10") Integer size) {
-        log.info("Got request to GET all events with parameters: users = {}, states = {}, categories = {}, rangeStart = {}, rangeEnd = {}, from = {}, size = {}", users, states, categories, rangeStart, rangeEnd, from, size);
+        log.info("Got request to GET all events with parameters: users = {}, states = {}, categories = {}, " +
+                                                        "rangeStart = {}, rangeEnd = {}, from = {}, size = {}",
+                                                        users, states, categories, rangeStart, rangeEnd, from, size);
         LocalDateTime start = (rangeStart == null) ? null : LocalDateTime.parse(rangeStart, FORMATTER);
         LocalDateTime end = (rangeEnd == null) ? null : LocalDateTime.parse(rangeEnd, FORMATTER);
         return eventService.getAllEventsAdmin(users, states, categories, start, end, from, size);

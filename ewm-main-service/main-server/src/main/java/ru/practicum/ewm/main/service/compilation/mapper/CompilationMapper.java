@@ -8,20 +8,20 @@ import ru.practicum.ewm.main.service.compilation.model.Compilation;
 import ru.practicum.ewm.main.service.event.dto.EventShortDto;
 import ru.practicum.ewm.main.service.event.model.Event;
 
-import java.util.List;
+import java.util.Set;
 
 @Mapper(componentModel = "spring")
 public interface CompilationMapper {
     @Mapping(target = "events", source = "events")
-    Compilation compilationFromNewDto(CompilationNewDto compilationNewDto, List<Event> events);
+    Compilation compilationFromNewDto(CompilationNewDto compilationNewDto, Set<Event> events);
 
     @Mapping(target = "events", source = "events")
-    CompilationDto compilationToDto(Compilation compilation, List<EventShortDto> events);
+    CompilationDto compilationToDto(Compilation compilation, Set<EventShortDto> events);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "events", source = "eventsNew")
     void updateCompilationFromDto(CompilationUpdateDto compilationUpdateDto,
                                   @MappingTarget Compilation compOld,
-                                  List<Event> eventsNew);
+                                  Set<Event> eventsNew);
 }

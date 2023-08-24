@@ -10,12 +10,15 @@ import ru.practicum.ewm.main.service.util.Pagination;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 
 public interface EventRepository extends JpaRepository<Event, Long> {
 
     List<Event> findAllByInitiator(User user, Pagination page);
 
-    List<Event> findByIdIn(List<Long> ids);
+    Set<Event> findByIdIn(Set<Long> ids);
+
+    List<Event> findAllByCategoryId(Long categoryId);
 
     @Query(value = "SELECT e " +
             "FROM Event AS e " +
@@ -54,6 +57,4 @@ public interface EventRepository extends JpaRepository<Event, Long> {
                                      @Param("rangeStart") LocalDateTime rangeStart,
                                      @Param("rangeEnd") LocalDateTime rangeEnd,
                                      Pagination page);
-
-    List<Event> findAllByCategoryId(Long categoryId);
 }

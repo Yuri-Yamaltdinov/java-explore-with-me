@@ -4,20 +4,20 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Data;
 import lombok.experimental.FieldDefaults;
-import org.hibernate.validator.constraints.Length;
 
-import java.util.List;
+import javax.validation.constraints.Size;
+import java.util.Set;
 
 @Data
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class CompilationUpdateDto {
 
-    List<Long> events;
+    Set<Long> events;
 
     Boolean pinned;
 
-    @Length(min = 1,
+    @Size(min = 1,
             max = 20,
             message = "Title length must be between 1 and 20 characters.")
     String title;

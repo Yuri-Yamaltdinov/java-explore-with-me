@@ -84,7 +84,10 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    public List<EventShortDto> getAllShortDto(List<Long> ids) {
+    public Set<EventShortDto> getAllShortDto(Set<Long> ids) {
+        if (ids == null) {
+            return Collections.emptySet();
+        }
         List<Event> events = eventRepository.findAllById(ids);
         List<EventShortDto> result = new ArrayList<>();
 
@@ -92,13 +95,13 @@ public class EventServiceImpl implements EventService {
             Long views = getViewsFromStatServer(event);
             result.add(eventMapper.eventShortDtoFromEvent(event, views));
         }
-        return result;
+        return new HashSet<>(result);
     }
 
     @Override
-    public List<Event> getAll(List<Long> ids) {
+    public Set<Event> getAll(Set<Long> ids) {
         if (ids == null) {
-            return Collections.emptyList();
+            return Collections.emptySet();
         }
         return eventRepository.findByIdIn(ids);
     }
@@ -219,7 +222,6 @@ public class EventServiceImpl implements EventService {
         Pagination page = new Pagination(from, size);
         List<Event> events = eventRepository
                             .findAllByParamsPublic(text, categories, paid, rangeStart, rangeEnd, onlyAvailable, page);
-        //List<EventShortDto> result = eventMapper.eventShortDtoListFromListEvent(events);
         List<EventShortDto> result = new ArrayList<>();
         Map<String, Long> statistics = getViewsFromStatServer(events);
 
@@ -330,7 +332,8 @@ public class EventServiceImpl implements EventService {
     }
 
     public Event getOrThrow(Long eventId) {
-        return eventRepository.findById(eventId).orElseThrow(() -> new EntityNotFoundException(Event.class, String.format("ID: %s", eventId)));
+        return eventRepository.findById(eventId).orElseThrow(() ->
+                new EntityNotFoundException(Event.class, String.format("ID: %s", eventId)));
     }
 
     private void checkEventInitiatorOrThrow(Event event, User user) {

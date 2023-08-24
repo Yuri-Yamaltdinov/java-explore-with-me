@@ -5,7 +5,7 @@ import lombok.experimental.FieldDefaults;
 import ru.practicum.ewm.main.service.event.model.Event;
 
 import javax.persistence.*;
-import java.util.List;
+import java.util.Set;
 
 @Data
 @Builder
@@ -20,12 +20,12 @@ public class Compilation {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToMany
-    @JoinTable (name = "compilation_event",
-            joinColumns = @JoinColumn (name = "compilation_id"),
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(name = "compilation_event",
+            joinColumns = @JoinColumn(name = "compilation_id"),
             inverseJoinColumns = @JoinColumn(name = "event_id"))
     @ToString.Exclude
-    List<Event> events;
+    Set<Event> events;
 
     @Builder.Default
     Boolean pinned = false;

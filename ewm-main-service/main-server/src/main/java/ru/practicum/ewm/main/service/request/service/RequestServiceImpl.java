@@ -45,20 +45,18 @@ public class RequestServiceImpl implements RequestService {
 
         User user = userService.getOrThrow(userId);
         Event event = eventService.getOrThrow(eventId);
-        if (event.getInitiator().equals(user) ||
-                !event.getState().equals(State.PUBLISHED)) {
+        if (event.getInitiator().equals(user) || !event.getState().equals(State.PUBLISHED)) {
             throw new ConflictException("Integrity constraint violation");
         }
 
-        if (event.getConfirmedRequests() >= event.getParticipantLimit()
-                && event.getParticipantLimit() > 0) {
+        if (event.getConfirmedRequests() >= event.getParticipantLimit() && event.getParticipantLimit() > 0) {
             throw new ConflictException("Integrity constraint violation");
         }
 
         ParticipationRequest request = ParticipationRequest.builder()
-                .created(LocalDateTime.now())
-                .requester(user)
-                .event(event).build();
+                                                            .created(LocalDateTime.now())
+                                                            .requester(user)
+                                                            .event(event).build();
         if (!event.getRequestModeration() || event.getParticipantLimit() == 0) {
             request.setStatus(CONFIRMED);
             eventService.increaseConfirmedRequests(event);

@@ -6,15 +6,15 @@ import lombok.Data;
 import lombok.experimental.FieldDefaults;
 import ru.practicum.ewm.main.service.event.dto.EventShortDto;
 
-import java.util.List;
+import java.util.Set;
 
 @Data
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class CompilationDto {
 
-    List<EventShortDto> events;
-    Long id;
-    Boolean pinned;
-    String title;
+    private Set<EventShortDto> events;
+    private Long id;
+    private Boolean pinned;
+    private String title;
 }
