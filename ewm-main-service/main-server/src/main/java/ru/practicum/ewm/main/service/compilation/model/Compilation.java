@@ -21,9 +21,9 @@ public class Compilation {
     private Long id;
 
     @ManyToMany
-    @JoinTable (name="compilation_event",
-            joinColumns=@JoinColumn (name="compilation_id"),
-            inverseJoinColumns=@JoinColumn(name="event_id"))
+    @JoinTable (name = "compilation_event",
+            joinColumns = @JoinColumn (name = "compilation_id"),
+            inverseJoinColumns = @JoinColumn(name = "event_id"))
     @ToString.Exclude
     List<Event> events;
 

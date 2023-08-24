@@ -30,7 +30,9 @@ public interface EventService {
     Map<String, Long> getViewsFromStatServer(List<Event> events);
 
     void increaseConfirmedRequests(Event event);
+
     void decreaseConfirmedRequests(Event event);
+
     void updateEvent(Event event);
 
     List<EventShortDto> getAllEventsPublic(String text, List<Long> categories, Boolean paid, LocalDateTime rangeStart, LocalDateTime rangeEnd, Boolean onlyAvailable, String sort, Integer from, Integer size, HttpServletRequest request);

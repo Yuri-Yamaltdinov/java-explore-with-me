@@ -213,8 +213,8 @@ public class EventServiceImpl implements EventService {
             throw new CustomValidationException("Start must be after End");
         }
         Pagination page = new Pagination(from, size);
-        List<Event> events = eventRepository.
-                findAllByParamsPublic(text, categories, paid, rangeStart, rangeEnd, onlyAvailable, page);
+        List<Event> events = eventRepository
+                            .findAllByParamsPublic(text, categories, paid, rangeStart, rangeEnd, onlyAvailable, page);
         List<EventShortDto> result = eventMapper.eventShortDtoListFromListEvent(events);
 
         if (sort != null) {

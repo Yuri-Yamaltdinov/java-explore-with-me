@@ -15,7 +15,6 @@ import javax.validation.constraints.PositiveOrZero;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static ru.practicum.ewm.main.service.util.Constants.DATE_FORMAT;
 import static ru.practicum.ewm.main.service.util.Constants.FORMATTER;
 
 @RestController

@@ -37,6 +37,7 @@ public interface EventRepository extends JpaRepository<Event, Long> {
                                          @Param("rangeEnd") LocalDateTime rangeEnd,
                                          @Param("onlyAvailable") Boolean onlyAvailable,
                                          Pagination page);
+
     @Query(value = "SELECT e " +
             "FROM Event AS e " +
             "WHERE (:users IS NULL OR e.initiator.id IN :users) " +
