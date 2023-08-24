@@ -5,7 +5,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.ewm.stats.dto.HitRequestDto;
 import ru.practicum.ewm.stats.dto.ViewStatsResponseDto;
@@ -36,9 +35,9 @@ public class StatsController {
     @ResponseStatus(HttpStatus.OK)
     public List<ViewStatsResponseDto> getStats(
             @RequestParam(name = "start", required = true)
-            @DateTimeFormat(pattern = DATE_TIME_PATTERN) LocalDateTime start,
+            @DateTimeFormat(pattern = DATE_FORMAT) LocalDateTime start,
             @RequestParam(name = "end", required = true)
-            @DateTimeFormat(pattern = DATE_TIME_PATTERN) LocalDateTime end,
+            @DateTimeFormat(pattern = DATE_FORMAT) LocalDateTime end,
             @RequestParam(name = "uris", required = false) List<String> uris,
             @RequestParam(name = "unique", required = false, defaultValue = "false") boolean unique
     ) {

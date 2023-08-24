@@ -113,8 +113,26 @@ public abstract class EventMapper {
 
     public abstract Location locationFromDto(LocationDto locationDto);
 
-    @Mapping(target = "views", source = "views")
-    public abstract EventShortDto eventShortDtoFromEvent(Event event, Long views);
+    public EventShortDto eventShortDtoFromEvent(Event event, Long views) {
+        if (event == null) {
+            return null;
+        }
+
+        EventShortDto.EventShortDtoBuilder eventShortDto = EventShortDto.builder();
+
+        eventShortDto.annotation(event.getAnnotation());
+        eventShortDto.category(categoryDtoFromCategory(event.getCategory()));
+        eventShortDto.confirmedRequests(event.getConfirmedRequests());
+        eventShortDto.eventDate(event.getEventDate());
+        eventShortDto.id(event.getId());
+        eventShortDto.initiator(userShortDtoFromUser(event.getInitiator()));
+        eventShortDto.paid(event.getPaid());
+        eventShortDto.title(event.getTitle());
+
+        eventShortDto.views(views);
+
+        return eventShortDto.build();
+    }
 
     public abstract CategoryDto categoryDtoFromCategory(Category category);
 
