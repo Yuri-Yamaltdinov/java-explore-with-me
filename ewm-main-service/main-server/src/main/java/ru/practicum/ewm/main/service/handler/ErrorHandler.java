@@ -36,18 +36,6 @@ public class ErrorHandler {
                 .build();
     }
 
-/*    @ExceptionHandler
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ApiError handleValidationException(final ValidationException e) {
-        log.error(e.getMessage(), e);
-        return ApiError.builder()
-                .status(HttpStatus.BAD_REQUEST)
-                .reason("Incorrectly made request.")
-                .message(e.getMessage())
-                .timestamp(LocalDateTime.now())
-                .build();
-    }*/
-
     @ExceptionHandler(MissingRequestHeaderException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ApiError handleMissingRequestHeaderException(MissingRequestHeaderException e) {
@@ -97,18 +85,6 @@ public class ErrorHandler {
                 .timestamp(LocalDateTime.now())
                 .build();
     }
-
-/*    @ExceptionHandler(ConstraintViolationException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ApiError handleHibernateViolationException(ConstraintViolationException e) {
-        log.error("400 — Constraint Violation");
-        return ApiError.builder()
-                .status(HttpStatus.CONFLICT)
-                .reason("Integrity constraint has been violated.")
-                .message(e.getMessage())
-                .timestamp(LocalDateTime.now())
-                .build();
-    }*/
 
     @ExceptionHandler(EntityNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)

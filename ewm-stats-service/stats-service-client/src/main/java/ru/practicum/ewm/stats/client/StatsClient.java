@@ -91,7 +91,6 @@ public class StatsClient {
             return ResponseEntity.status(e.getStatusCode()).body(e.getResponseBodyAsByteArray());
         }
 
-        //return prepareGatewayResponse(statsServerResponse);
         return statsServerResponse;
     }
 

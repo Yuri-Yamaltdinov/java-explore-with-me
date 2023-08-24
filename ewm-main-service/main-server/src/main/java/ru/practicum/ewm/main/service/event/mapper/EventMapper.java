@@ -139,21 +139,4 @@ public abstract class EventMapper {
 
     protected abstract LocationDto locationToLocationDto(Location location);
 
-/*    public List<EventShortDto> eventShortDtoListFromListEvent(List<Event> events) {
-        if (events == null) {
-            return null;
-        }
-        if (events.isEmpty()) {
-            return Collections.emptyList();
-        }
-        Map<String, Long> statistics = eventService.getViewsFromStatServer(events);
-        List<EventShortDto> result = new ArrayList<>();
-        for (Event event : events) {
-            EventShortDto eventShortDto = eventShortDtoFromEvent(event, statistics.get("/events/" + event.getId()));
-            result.add(eventShortDto);
-        }
-
-        return result;
-    }*/
-
 }

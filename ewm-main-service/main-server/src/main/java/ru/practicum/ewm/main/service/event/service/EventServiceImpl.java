@@ -112,7 +112,7 @@ public class EventServiceImpl implements EventService {
         User user = userService.getOrThrow(userId);
         Event event = getOrThrow(eventId);
         checkEventInitiatorOrThrow(event, user);
-        //Long views = getViewsFromStatServer(event);
+
         String uri = "/events/" + event.getId();
         Map<String, Long> result = getViewsFromStatServer(List.of(event));
         Long views = result.get(uri);
@@ -186,7 +186,7 @@ public class EventServiceImpl implements EventService {
         if (updateEventUserRequest.getEventDate() != null) {
             checkEventDateOrThrow(updateEventUserRequest.getEventDate(), timeDiff);
         }
-        //Long views = getViewsFromStatServer(event);
+
         String uri = "/events/" + event.getId();
         Map<String, Long> result = getViewsFromStatServer(List.of(event));
         Long views = result.get(uri);
@@ -209,7 +209,7 @@ public class EventServiceImpl implements EventService {
             throw new EntityNotFoundException(Event.class, "Event is not PUBLISHED.");
         }
         addHit(request);
-        //Long views = getViewsFromStatServer(event);
+
         String uri = "/events/" + event.getId();
         Map<String, Long> result = getViewsFromStatServer(List.of(event));
         Long views = result.get(uri);
