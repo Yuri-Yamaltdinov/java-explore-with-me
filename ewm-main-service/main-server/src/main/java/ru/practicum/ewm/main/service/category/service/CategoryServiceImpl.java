@@ -3,6 +3,7 @@ package ru.practicum.ewm.main.service.category.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.ewm.main.service.category.dto.CategoryDto;
 import ru.practicum.ewm.main.service.category.mapper.CategoryMapper;
 import ru.practicum.ewm.main.service.category.model.Category;
@@ -25,6 +26,7 @@ public class CategoryServiceImpl implements CategoryService {
     private final EventRepository eventRepository;
 
     @Override
+    @Transactional
     public void delete(Long catId) {
         getOrThrow(catId);
 
@@ -38,6 +40,7 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
+    @Transactional
     public CategoryDto create(CategoryDto categoryDto) {
         try {
             Category category = categoryMapper.categoryFromDto(categoryDto);
@@ -49,6 +52,7 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
+    @Transactional
     public CategoryDto update(Long catId, CategoryDto categoryDto) {
         Category category = getOrThrow(catId);
         categoryMapper.updateCategoryFromDto(categoryDto, category);

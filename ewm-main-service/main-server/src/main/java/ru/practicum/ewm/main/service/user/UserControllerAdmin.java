@@ -10,6 +10,8 @@ import ru.practicum.ewm.main.service.user.service.UserService;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 import java.util.List;
 
 @RestController
@@ -23,8 +25,8 @@ public class UserControllerAdmin {
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     public List<UserDto> getAll(@RequestParam(required = false) Long[] ids,
-                                @RequestParam(defaultValue = "0") Integer from,
-                                @RequestParam(defaultValue = "10") Integer size,
+                                @PositiveOrZero @RequestParam(defaultValue = "0") Integer from,
+                                @Positive @RequestParam(defaultValue = "10") Integer size,
                                 HttpServletRequest request) {
         log.info("Get users. Params={}", request.getParameterMap());
         return userService.getAllUsers(ids, from, size);

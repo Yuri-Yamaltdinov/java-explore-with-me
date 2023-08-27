@@ -2,6 +2,7 @@ package ru.practicum.ewm.main.service.compilation.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.ewm.main.service.compilation.dto.CompilationDto;
 import ru.practicum.ewm.main.service.compilation.dto.CompilationNewDto;
 import ru.practicum.ewm.main.service.compilation.dto.CompilationUpdateDto;
@@ -31,6 +32,7 @@ public class CompilationServiceImpl implements CompilationService {
     private final EventService eventService;
 
     @Override
+    @Transactional
     public CompilationDto create(CompilationNewDto compilationNewDto) {
         if (compilationNewDto.getPinned() == null) {
             compilationNewDto.setPinned(false);
@@ -49,18 +51,19 @@ public class CompilationServiceImpl implements CompilationService {
     }
 
     @Override
+    @Transactional
     public void delete(Long compId) {
         Compilation compilation = getOrThrow(compId);
         compilationRepository.delete(compilation);
     }
 
     @Override
+    @Transactional
     public CompilationDto update(Long compId, CompilationUpdateDto compilationUpdateDto) {
         Compilation compilation = getOrThrow(compId);
         Set<Event> eventsNew = eventService.getAll(compilationUpdateDto.getEvents());
         Set<EventShortDto> eventShortDtos = eventService.getAllShortDto(compilationUpdateDto.getEvents());
         compilationMapper.updateCompilationFromDto(compilationUpdateDto, compilation, eventsNew);
-        compilation = compilationRepository.saveAndFlush(compilation);
         return compilationMapper.compilationToDto(compilation, eventShortDtos);
     }
 

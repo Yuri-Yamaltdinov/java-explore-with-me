@@ -1,12 +1,12 @@
 package ru.practicum.ewm.main.service.event.model;
 
 import lombok.*;
-import lombok.experimental.FieldDefaults;
 import ru.practicum.ewm.main.service.category.model.Category;
 import ru.practicum.ewm.main.service.location.model.Location;
 import ru.practicum.ewm.main.service.user.model.User;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
 import java.time.LocalDateTime;
 
 import static ru.practicum.ewm.main.service.event.model.State.PENDING;
@@ -17,7 +17,6 @@ import static ru.practicum.ewm.main.service.event.model.State.PENDING;
 @AllArgsConstructor
 @Entity
 @Table(name = "events")
-@FieldDefaults(level = AccessLevel.PRIVATE)
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class Event {
     @Id
@@ -25,7 +24,8 @@ public class Event {
     @EqualsAndHashCode.Include
     private Long id;
 
-    @Column(length = 2000, nullable = false)
+    @NotBlank
+    @Column(length = 2000)
     private String annotation;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -40,7 +40,8 @@ public class Event {
     @Column(name = "created_on")
     private LocalDateTime createdOn;
 
-    @Column(length = 7000, nullable = false)
+    @NotBlank
+    @Column(length = 7000)
     private String description;
 
     @Column(name = "event_date")
@@ -71,6 +72,7 @@ public class Event {
     @Builder.Default
     private State state = PENDING;
 
-    @Column(length = 120, nullable = false)
+    @NotBlank
+    @Column(length = 120)
     private String title;
 }

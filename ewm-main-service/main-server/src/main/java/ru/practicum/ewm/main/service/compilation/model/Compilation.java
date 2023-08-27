@@ -1,10 +1,10 @@
 package ru.practicum.ewm.main.service.compilation.model;
 
 import lombok.*;
-import lombok.experimental.FieldDefaults;
 import ru.practicum.ewm.main.service.event.model.Event;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
 import java.util.Set;
 
 @Data
@@ -13,7 +13,6 @@ import java.util.Set;
 @AllArgsConstructor
 @Entity
 @Table(name = "compilations")
-@FieldDefaults(level = AccessLevel.PRIVATE)
 public class Compilation {
 
     @Id
@@ -25,11 +24,12 @@ public class Compilation {
             joinColumns = @JoinColumn(name = "compilation_id"),
             inverseJoinColumns = @JoinColumn(name = "event_id"))
     @ToString.Exclude
-    Set<Event> events;
+    private Set<Event> events;
 
     @Builder.Default
-    Boolean pinned = false;
+    private Boolean pinned = false;
 
-    @Column(length = 50, nullable = false)
-    String title;
+    @NotBlank
+    @Column(length = 50)
+    private String title;
 }

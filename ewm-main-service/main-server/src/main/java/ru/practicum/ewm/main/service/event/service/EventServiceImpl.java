@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.ewm.main.service.event.dto.EventFullDto;
 import ru.practicum.ewm.main.service.event.dto.EventShortDto;
 import ru.practicum.ewm.main.service.event.dto.NewEventDto;
@@ -46,6 +47,7 @@ public class EventServiceImpl implements EventService {
     private final LocationMapper locationMapper;
 
     @Override
+    @Transactional
     public EventFullDto create(Long userId, NewEventDto newEventDto) {
         User initiator = userService.getOrThrow(userId);
         Long timeDiff = 2L;
@@ -120,12 +122,13 @@ public class EventServiceImpl implements EventService {
         return eventMapper.eventFullDtoFromEvent(event, views);
     }
 
-    @Override
+/*    @Override
     public void updateEvent(Event event) {
         eventRepository.saveAndFlush(event);
-    }
+    }*/
 
     @Override
+    @Transactional
     public EventFullDto updateEvent(Long userId, Long eventId, UpdateEventUserRequest updateEventUserRequest) {
         User user = userService.getOrThrow(userId);
         Event event = getOrThrow(eventId);
@@ -159,6 +162,7 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
+    @Transactional
     public EventFullDto updateEventAdmin(Long eventId, UpdateEventUserRequest updateEventUserRequest) {
         Event event = getOrThrow(eventId);
         Long timeDiff = 1L;
@@ -196,10 +200,11 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
+    @Transactional
     public void decreaseConfirmedRequests(Event event) {
         Long confirmedRequestsNew = event.getConfirmedRequests() - 1L;
         event.setConfirmedRequests(confirmedRequestsNew);
-        eventRepository.saveAndFlush(event);
+        //eventRepository.saveAndFlush(event);
     }
 
     @Override
@@ -297,22 +302,6 @@ public class EventServiceImpl implements EventService {
                 .collect(Collectors.toMap(ViewStatsResponseDto::getUri, ViewStatsResponseDto::getHits, (a, b) -> b));
 
         return resultMap;
-    }
-
-    private Long getViewsFromStatServer(Event event) {
-        LocalDateTime start = LocalDateTime.MIN;
-        LocalDateTime end = LocalDateTime.MAX;
-        String uri = String.format("/events/%d", event.getId());
-        String[] uris = {uri};
-        Boolean unique = false;
-
-        List<ViewStatsResponseDto> statistics = statsClient.getStatistics(start, end, uris, unique);
-
-        if (statistics.isEmpty()) {
-            return 0L;
-        } else {
-            return statistics.get(0).getHits();
-        }
     }
 
     private void addHit(HttpServletRequest request) {

@@ -1,7 +1,6 @@
 package ru.practicum.ewm.main.service.request.model;
 
 import lombok.*;
-import lombok.experimental.FieldDefaults;
 import ru.practicum.ewm.main.service.event.model.Event;
 import ru.practicum.ewm.main.service.user.model.User;
 
@@ -16,7 +15,6 @@ import static ru.practicum.ewm.main.service.request.model.RequestStatus.PENDING;
 @AllArgsConstructor
 @Entity
 @Table(name = "requests")
-@FieldDefaults(level = AccessLevel.PRIVATE)
 public class ParticipationRequest {
 
     @Id

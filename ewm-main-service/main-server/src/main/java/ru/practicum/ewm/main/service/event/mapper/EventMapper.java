@@ -12,13 +12,11 @@ import ru.practicum.ewm.main.service.event.dto.EventShortDto;
 import ru.practicum.ewm.main.service.event.dto.NewEventDto;
 import ru.practicum.ewm.main.service.event.dto.UpdateEventUserRequest;
 import ru.practicum.ewm.main.service.event.model.Event;
-import ru.practicum.ewm.main.service.event.service.EventService;
 import ru.practicum.ewm.main.service.location.dto.LocationDto;
 import ru.practicum.ewm.main.service.location.model.Location;
 import ru.practicum.ewm.main.service.location.repository.LocationRepository;
 import ru.practicum.ewm.main.service.user.dto.UserShortDto;
 import ru.practicum.ewm.main.service.user.model.User;
-import ru.practicum.ewm.stats.client.StatsClient;
 
 @Mapper(componentModel = "spring")
 public abstract class EventMapper {
@@ -26,9 +24,6 @@ public abstract class EventMapper {
     protected CategoryService categoryService;
     @Autowired
     protected LocationRepository locationRepository;
-    protected EventService eventService;
-    @Autowired
-    protected StatsClient statsClient;
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "category", source = "newEventDto", qualifiedByName = "categoryFromNewEventDto")
@@ -50,10 +45,10 @@ public abstract class EventMapper {
             return;
         }
 
-        if (eventURDto.getAnnotation() != null) {
+        if (eventURDto.getAnnotation() != null || !eventURDto.getAnnotation().isBlank()) {
             event.setAnnotation(eventURDto.getAnnotation());
         }
-        if (eventURDto.getDescription() != null) {
+        if (eventURDto.getDescription() != null || !eventURDto.getAnnotation().isBlank()) {
             event.setDescription(eventURDto.getDescription());
         }
         if (eventURDto.getEventDate() != null) {
@@ -68,7 +63,7 @@ public abstract class EventMapper {
         if (eventURDto.getRequestModeration() != null) {
             event.setRequestModeration(eventURDto.getRequestModeration());
         }
-        if (eventURDto.getTitle() != null) {
+        if (eventURDto.getTitle() != null || !eventURDto.getAnnotation().isBlank()) {
             event.setTitle(eventURDto.getTitle());
         }
 

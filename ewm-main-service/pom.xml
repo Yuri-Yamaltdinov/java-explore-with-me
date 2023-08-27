@@ -20,18 +20,6 @@
         <module>main-server</module>
     </modules>
 
-<!--    <dependencies>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-actuator</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>ru.practicum</groupId>
-            <artifactId>stats-service-client</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
-        </dependency>
-    </dependencies>-->
-
     <build>
 		<pluginManagement>
 			<plugins>

@@ -2,6 +2,7 @@ package ru.practicum.ewm.main.service.request.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.ewm.main.service.event.model.Event;
 import ru.practicum.ewm.main.service.event.model.State;
 import ru.practicum.ewm.main.service.event.service.EventService;
@@ -36,6 +37,7 @@ public class RequestServiceImpl implements RequestService {
     private final ParticipationRequestMapper requestMapper;
 
     @Override
+    @Transactional
     public ParticipationRequestDto create(Long userId, Long eventId) {
         Optional<ParticipationRequest> requestOptional = requestRepository.findByRequesterIdAndEventId(userId, eventId);
 
@@ -77,6 +79,7 @@ public class RequestServiceImpl implements RequestService {
     }
 
     @Override
+    @Transactional
     public ParticipationRequestDto cancelRequest(Long userId, Long requestId) {
         userService.getOrThrow(userId);
         ParticipationRequest request = getOrThrow(requestId);
@@ -106,6 +109,7 @@ public class RequestServiceImpl implements RequestService {
     }
 
     @Override
+    @Transactional
     public EventRequestStatusUpdateResult updateRequestStatus(Long userId, Long eventId, EventRequestStatusUpdateRequest requestsUpdating) {
         User user = userService.getOrThrow(userId);
         Event event = eventService.getOrThrow(eventId);
@@ -170,7 +174,7 @@ public class RequestServiceImpl implements RequestService {
         result.setConfirmedRequests(confirmedRequests);
         result.setRejectedRequests(rejectedRequests);
         event.setConfirmedRequests(event.getParticipantLimit() - vacantPlace);
-        eventService.updateEvent(event);
+        //eventService.updateEvent(event);
         return result;
     }
 }

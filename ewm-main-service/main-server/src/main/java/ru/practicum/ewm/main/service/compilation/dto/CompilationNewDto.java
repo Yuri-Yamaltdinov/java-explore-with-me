@@ -1,9 +1,7 @@
 package ru.practicum.ewm.main.service.compilation.dto;
 
-import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Data;
-import lombok.experimental.FieldDefaults;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
@@ -11,7 +9,6 @@ import java.util.Set;
 
 @Data
 @Builder
-@FieldDefaults(level = AccessLevel.PRIVATE)
 public class CompilationNewDto {
 
     private Set<Long> events;

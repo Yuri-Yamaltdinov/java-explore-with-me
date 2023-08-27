@@ -1,9 +1,12 @@
 package ru.practicum.ewm.main.service.user.model;
 
-import lombok.*;
-import lombok.experimental.FieldDefaults;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
 
 @Data
 @Builder
@@ -11,7 +14,6 @@ import javax.persistence.*;
 @AllArgsConstructor
 @Entity
 @Table(name = "users")
-@FieldDefaults(level = AccessLevel.PRIVATE)
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -20,7 +22,8 @@ public class User {
     @Column(nullable = false)
     private String name;
 
-    @Column(length = 512, nullable = false, unique = true)
+    @NotBlank
+    @Column(length = 512, unique = true)
     private String email;
 
 }

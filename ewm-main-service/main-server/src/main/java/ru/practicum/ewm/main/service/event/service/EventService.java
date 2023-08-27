@@ -34,13 +34,28 @@ public interface EventService {
 
     void decreaseConfirmedRequests(Event event);
 
-    void updateEvent(Event event);
+    //void updateEvent(Event event);
 
-    List<EventShortDto> getAllEventsPublic(String text, List<Long> categories, Boolean paid, LocalDateTime rangeStart, LocalDateTime rangeEnd, Boolean onlyAvailable, String sort, Integer from, Integer size, HttpServletRequest request);
+    List<EventShortDto> getAllEventsPublic(String text,
+                                           List<Long> categories,
+                                           Boolean paid,
+                                           LocalDateTime rangeStart,
+                                           LocalDateTime rangeEnd,
+                                           Boolean onlyAvailable,
+                                           String sort,
+                                           Integer from,
+                                           Integer size,
+                                           HttpServletRequest request);
 
     EventFullDto getEventPublic(Long eventId, HttpServletRequest request);
 
-    List<EventFullDto> getAllEventsAdmin(List<Long> users, List<State> states, List<Long> categories, LocalDateTime rangeStart, LocalDateTime rangeEnd, Integer from, Integer size);
+    List<EventFullDto> getAllEventsAdmin(List<Long> users,
+                                         List<State> states,
+                                         List<Long> categories,
+                                         LocalDateTime rangeStart,
+                                         LocalDateTime rangeEnd,
+                                         Integer from,
+                                         Integer size);
 
     EventFullDto updateEventAdmin(Long eventId, UpdateEventUserRequest updateEventUserRequest);
 }
