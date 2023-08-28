@@ -27,20 +27,6 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     @Transactional
-    public void delete(Long catId) {
-        getOrThrow(catId);
-
-        List<Event> events = eventRepository.findAllByCategoryId(catId);
-
-        if (events.isEmpty()) {
-            categoryRepository.deleteById(catId);
-        } else {
-            throw new ConflictException("The category is not empty");
-        }
-    }
-
-    @Override
-    @Transactional
     public CategoryDto create(CategoryDto categoryDto) {
         try {
             Category category = categoryMapper.categoryFromDto(categoryDto);
@@ -64,6 +50,20 @@ public class CategoryServiceImpl implements CategoryService {
         }
 
         return categoryMapper.categoryToDto(category);
+    }
+
+    @Override
+    @Transactional
+    public void delete(Long catId) {
+        getOrThrow(catId);
+
+        List<Event> events = eventRepository.findAllByCategoryId(catId);
+
+        if (events.isEmpty()) {
+            categoryRepository.deleteById(catId);
+        } else {
+            throw new ConflictException("The category is not empty");
+        }
     }
 
     @Override

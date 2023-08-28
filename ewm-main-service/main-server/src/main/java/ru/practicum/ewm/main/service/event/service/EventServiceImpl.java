@@ -122,10 +122,10 @@ public class EventServiceImpl implements EventService {
         return eventMapper.eventFullDtoFromEvent(event, views);
     }
 
-/*    @Override
+    @Override
     public void updateEvent(Event event) {
         eventRepository.saveAndFlush(event);
-    }*/
+    }
 
     @Override
     @Transactional
@@ -200,7 +200,6 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    @Transactional
     public void decreaseConfirmedRequests(Event event) {
         Long confirmedRequestsNew = event.getConfirmedRequests() - 1L;
         event.setConfirmedRequests(confirmedRequestsNew);

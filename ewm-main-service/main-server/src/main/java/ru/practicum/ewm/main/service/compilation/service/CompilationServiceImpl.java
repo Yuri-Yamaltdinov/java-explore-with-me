@@ -52,19 +52,19 @@ public class CompilationServiceImpl implements CompilationService {
 
     @Override
     @Transactional
-    public void delete(Long compId) {
-        Compilation compilation = getOrThrow(compId);
-        compilationRepository.delete(compilation);
-    }
-
-    @Override
-    @Transactional
     public CompilationDto update(Long compId, CompilationUpdateDto compilationUpdateDto) {
         Compilation compilation = getOrThrow(compId);
         Set<Event> eventsNew = eventService.getAll(compilationUpdateDto.getEvents());
         Set<EventShortDto> eventShortDtos = eventService.getAllShortDto(compilationUpdateDto.getEvents());
         compilationMapper.updateCompilationFromDto(compilationUpdateDto, compilation, eventsNew);
         return compilationMapper.compilationToDto(compilation, eventShortDtos);
+    }
+
+    @Override
+    @Transactional
+    public void delete(Long compId) {
+        Compilation compilation = getOrThrow(compId);
+        compilationRepository.delete(compilation);
     }
 
     @Override

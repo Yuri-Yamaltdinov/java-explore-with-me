@@ -34,7 +34,7 @@ public interface EventService {
 
     void decreaseConfirmedRequests(Event event);
 
-    //void updateEvent(Event event);
+    void updateEvent(Event event);
 
     List<EventShortDto> getAllEventsPublic(String text,
                                            List<Long> categories,

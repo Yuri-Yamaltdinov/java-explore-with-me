@@ -45,10 +45,10 @@ public abstract class EventMapper {
             return;
         }
 
-        if (eventURDto.getAnnotation() != null || !eventURDto.getAnnotation().isBlank()) {
+        if (eventURDto.getAnnotation() != null && !eventURDto.getAnnotation().isBlank()) {
             event.setAnnotation(eventURDto.getAnnotation());
         }
-        if (eventURDto.getDescription() != null || !eventURDto.getAnnotation().isBlank()) {
+        if (eventURDto.getDescription() != null && !eventURDto.getDescription().isBlank()) {
             event.setDescription(eventURDto.getDescription());
         }
         if (eventURDto.getEventDate() != null) {
@@ -63,7 +63,7 @@ public abstract class EventMapper {
         if (eventURDto.getRequestModeration() != null) {
             event.setRequestModeration(eventURDto.getRequestModeration());
         }
-        if (eventURDto.getTitle() != null || !eventURDto.getAnnotation().isBlank()) {
+        if (eventURDto.getTitle() != null && !eventURDto.getTitle().isBlank()) {
             event.setTitle(eventURDto.getTitle());
         }
 

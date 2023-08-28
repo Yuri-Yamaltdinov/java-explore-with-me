@@ -174,7 +174,7 @@ public class RequestServiceImpl implements RequestService {
         result.setConfirmedRequests(confirmedRequests);
         result.setRejectedRequests(rejectedRequests);
         event.setConfirmedRequests(event.getParticipantLimit() - vacantPlace);
-        //eventService.updateEvent(event);
+        eventService.updateEvent(event);
         return result;
     }
 }
