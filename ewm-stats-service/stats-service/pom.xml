@@ -7,7 +7,6 @@
         <groupId>ru.practicum</groupId>
         <artifactId>ewm-stats-service</artifactId>
         <version>0.0.1-SNAPSHOT</version>
-        <relativePath>../pom.xml</relativePath>
     </parent>
 
     <artifactId>stats-service</artifactId>
@@ -61,6 +60,7 @@
         <dependency>
             <groupId>org.mapstruct</groupId>
             <artifactId>mapstruct</artifactId>
+            <version>${org.mapstruct.version}</version>
         </dependency>
     </dependencies>
 

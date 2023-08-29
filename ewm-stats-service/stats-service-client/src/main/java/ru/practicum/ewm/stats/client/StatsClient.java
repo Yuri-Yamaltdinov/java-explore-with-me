@@ -27,7 +27,7 @@ public class StatsClient {
     private final RestTemplate rest;
     private final ObjectMapper objectMapper;
     private static final String POST_HIT_PATH = "/hit";
-    private static final String GET_STATS_PATH = "/stats?start={start}&end={end}&uris={uris}&unique={unique}";
+    private static final String GET_STATS_PATH_WITH_URIS = "/stats?start={start}&end={end}&uris={uris}&unique={unique}";
     private static final String GET_STATS_PATH_WITHOUT_URIS = "/stats?start={start}&end={end}&unique={unique}";
 
     @Autowired
@@ -43,13 +43,12 @@ public class StatsClient {
         makeAndSendRequest(HttpMethod.POST, POST_HIT_PATH, null, hitRequestDto);
     }
 
-    public List<ViewStatsResponseDto> getStatistics(LocalDateTime start, LocalDateTime end,
-                                                    List<String> uris,
+    public List<ViewStatsResponseDto> getStatistics(LocalDateTime start,
+                                                    LocalDateTime end,
+                                                    String[] uris,
                                                     Boolean unique) {
-
         String startTime = start.format(FORMATTER);
         String endTime = end.format(FORMATTER);
-
         Map<String, Object> parameters;
         ResponseEntity<Object> statsServerResponse;
 
@@ -60,7 +59,7 @@ public class StatsClient {
                     "uris", uris,
                     "unique", unique.toString());
 
-            statsServerResponse = makeAndSendRequest(HttpMethod.GET, GET_STATS_PATH, parameters, null);
+            statsServerResponse = makeAndSendRequest(HttpMethod.GET, GET_STATS_PATH_WITH_URIS, parameters, null);
         } else {
             parameters = Map.of(
                     "start", startTime,
@@ -69,8 +68,11 @@ public class StatsClient {
 
             statsServerResponse = makeAndSendRequest(HttpMethod.GET, GET_STATS_PATH_WITHOUT_URIS, parameters, null);
         }
-        return objectMapper.convertValue(statsServerResponse.getBody(), new TypeReference<List<ViewStatsResponseDto>>(){});
-        }
+        return objectMapper.convertValue(statsServerResponse.getBody(), new TypeReference<List<ViewStatsResponseDto>>() {
+        });
+
+
+    }
 
     private ResponseEntity<Object> makeAndSendRequest(HttpMethod method,
                                                       String path,
@@ -89,7 +91,7 @@ public class StatsClient {
             return ResponseEntity.status(e.getStatusCode()).body(e.getResponseBodyAsByteArray());
         }
 
-        return prepareGatewayResponse(statsServerResponse);
+        return statsServerResponse;
     }
 
     private static ResponseEntity<Object> prepareGatewayResponse(ResponseEntity<Object> response) {
