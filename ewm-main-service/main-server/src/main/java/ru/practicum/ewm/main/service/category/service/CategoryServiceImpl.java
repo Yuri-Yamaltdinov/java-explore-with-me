@@ -43,11 +43,11 @@ public class CategoryServiceImpl implements CategoryService {
         Category category = getOrThrow(catId);
         categoryMapper.updateCategoryFromDto(categoryDto, category);
 
-/*        try {
+        try {
             category = categoryRepository.saveAndFlush(category);
         } catch (RuntimeException e) {
             throw new ConflictException(e.getMessage());
-        }*/
+        }
 
         return categoryMapper.categoryToDto(category);
     }
