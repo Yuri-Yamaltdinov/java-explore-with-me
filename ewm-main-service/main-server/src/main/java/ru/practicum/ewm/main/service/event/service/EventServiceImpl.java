@@ -203,7 +203,6 @@ public class EventServiceImpl implements EventService {
     public void decreaseConfirmedRequests(Event event) {
         Long confirmedRequestsNew = event.getConfirmedRequests() - 1L;
         event.setConfirmedRequests(confirmedRequestsNew);
-        //eventRepository.saveAndFlush(event);
     }
 
     @Override
