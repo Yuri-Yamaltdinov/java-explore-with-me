@@ -12,6 +12,7 @@ import ru.practicum.ewm.main.service.event.dto.EventShortDto;
 import ru.practicum.ewm.main.service.event.dto.NewEventDto;
 import ru.practicum.ewm.main.service.event.dto.UpdateEventUserRequest;
 import ru.practicum.ewm.main.service.event.model.Event;
+import ru.practicum.ewm.main.service.event.repository.RateRepository;
 import ru.practicum.ewm.main.service.location.dto.LocationDto;
 import ru.practicum.ewm.main.service.location.model.Location;
 import ru.practicum.ewm.main.service.location.repository.LocationRepository;
@@ -24,6 +25,8 @@ public abstract class EventMapper {
     protected CategoryService categoryService;
     @Autowired
     protected LocationRepository locationRepository;
+    @Autowired
+    protected RateRepository rateRepository;
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "category", source = "newEventDto", qualifiedByName = "categoryFromNewEventDto")
@@ -120,8 +123,11 @@ public abstract class EventMapper {
         eventShortDto.initiator(userShortDtoFromUser(event.getInitiator()));
         eventShortDto.paid(event.getPaid());
         eventShortDto.title(event.getTitle());
-
         eventShortDto.views(views);
+
+        if (rateRepository.getEventRateView(event.getId()).isPresent()) {
+            eventShortDto.ratesSum(rateRepository.getEventRateView(event.getId()).get().getRatesSum());
+        } else eventShortDto.ratesSum(0L);
 
         return eventShortDto.build();
     }

@@ -75,4 +75,5 @@ public class Event {
     @NotBlank
     @Column(length = 120)
     private String title;
+
 }

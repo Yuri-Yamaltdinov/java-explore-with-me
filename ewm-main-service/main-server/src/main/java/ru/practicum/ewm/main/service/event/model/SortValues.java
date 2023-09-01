@@ -4,7 +4,9 @@ import java.util.Optional;
 
 public enum SortValues {
     EVENT_DATE,
-    VIEWS;
+    VIEWS,
+    RATES;
+
     public static Optional<SortValues> from(String sort) {
         for (SortValues state : values()) {
             if (state.name().equalsIgnoreCase(sort)) {

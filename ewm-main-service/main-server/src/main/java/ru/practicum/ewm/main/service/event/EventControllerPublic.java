@@ -7,6 +7,8 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.ewm.main.service.event.dto.EventFullDto;
 import ru.practicum.ewm.main.service.event.dto.EventShortDto;
+import ru.practicum.ewm.main.service.event.model.EventRateView;
+import ru.practicum.ewm.main.service.event.model.InitiatorRateView;
 import ru.practicum.ewm.main.service.event.service.EventService;
 
 import javax.servlet.http.HttpServletRequest;
@@ -50,4 +52,22 @@ public class EventControllerPublic {
         log.info("Got request GET event, id={}", eventId);
         return eventService.getEventPublic(eventId, request);
     }
+
+    @GetMapping("/ratings")
+    @ResponseStatus(HttpStatus.OK)
+    public List<EventRateView> getEventRatings(@PositiveOrZero @RequestParam(defaultValue = "0") Integer from,
+                                               @Positive @RequestParam(defaultValue = "10") Integer size) {
+        log.info("Got request to GET ratings");
+        return eventService.getEventsRatings(from, size);
+    }
+
+    @GetMapping("/users/ratings")
+    @ResponseStatus(HttpStatus.OK)
+    public List<InitiatorRateView> getUsersRatings(@PositiveOrZero @RequestParam(defaultValue = "0") Integer from,
+                                                   @Positive @RequestParam(defaultValue = "10") Integer size) {
+        log.info("Got request to GET ratings");
+        return eventService.getUsersRatings(from, size);
+    }
+
+
 }

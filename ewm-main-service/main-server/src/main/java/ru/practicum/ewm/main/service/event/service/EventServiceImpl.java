@@ -5,15 +5,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.practicum.ewm.main.service.event.dto.EventFullDto;
-import ru.practicum.ewm.main.service.event.dto.EventShortDto;
-import ru.practicum.ewm.main.service.event.dto.NewEventDto;
-import ru.practicum.ewm.main.service.event.dto.UpdateEventUserRequest;
+import ru.practicum.ewm.main.service.event.dto.*;
 import ru.practicum.ewm.main.service.event.mapper.EventMapper;
-import ru.practicum.ewm.main.service.event.model.Event;
-import ru.practicum.ewm.main.service.event.model.SortValues;
-import ru.practicum.ewm.main.service.event.model.State;
+import ru.practicum.ewm.main.service.event.mapper.EventRateMapper;
+import ru.practicum.ewm.main.service.event.model.*;
 import ru.practicum.ewm.main.service.event.repository.EventRepository;
+import ru.practicum.ewm.main.service.event.repository.RateRepository;
 import ru.practicum.ewm.main.service.exception.ConflictException;
 import ru.practicum.ewm.main.service.exception.CustomValidationException;
 import ru.practicum.ewm.main.service.exception.EntityNotFoundException;
@@ -43,8 +40,10 @@ public class EventServiceImpl implements EventService {
     private final UserService userService;
     private final EventRepository eventRepository;
     private final EventMapper eventMapper;
+    private final EventRateMapper eventRateMapper;
     private final LocationRepository locationRepository;
     private final LocationMapper locationMapper;
+    private final RateRepository rateRepository;
 
     @Override
     @Transactional
@@ -200,6 +199,50 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
+    public EventRateDto addLike(Long userId, Long eventId, Boolean isLike) {
+        User user = userService.getOrThrow(userId);
+        Event event = getOrThrow(eventId);
+        long rate;
+        if (isLike) {
+            rate = 1L;
+        } else {
+            rate = -1L;
+        }
+        EventUserRate eventUserRate = EventUserRate.builder()
+                                        .event(event)
+                                        .user(user)
+                                        .rate(rate)
+                                        .build();
+        return eventRateMapper.eventRateToDto(rateRepository.save(eventUserRate));
+    }
+
+    @Override
+    public void deleteLike(Long userId, Long eventId) {
+        User user = userService.getOrThrow(userId);
+        Event event = getOrThrow(eventId);
+        if (!rateRepository.existsByUser_IdAndEvent_Id(userId,eventId)) {
+            throw new EntityNotFoundException(EventUserRate.class, "Event Rate does not exist. Nothing to delete.");
+        }
+        EventUserRate eventUserRate = EventUserRate.builder()
+                                            .event(event)
+                                            .user(user)
+                                            .build();
+        rateRepository.delete(eventUserRate);
+    }
+
+    @Override
+    public List<EventRateView> getEventsRatings(Integer from, Integer size) {
+        Pagination page = new Pagination(from, size);
+        return rateRepository.getAllEventsRateViews(page);
+    }
+
+    @Override
+    public List<InitiatorRateView> getUsersRatings(Integer from, Integer size) {
+        Pagination page = new Pagination(from, size);
+        return rateRepository.getAllUsersRateViews(page);
+    }
+
+    @Override
     public void decreaseConfirmedRequests(Event event) {
         Long confirmedRequestsNew = event.getConfirmedRequests() - 1L;
         event.setConfirmedRequests(confirmedRequestsNew);
@@ -253,6 +296,9 @@ public class EventServiceImpl implements EventService {
                     break;
                 case EVENT_DATE:
                     result.sort(Comparator.comparing(EventShortDto::getEventDate));
+                    break;
+                case RATES:
+                    result.sort((o1, o2) -> (int) (o2.getRatesSum() - o1.getRatesSum()));
             }
         }
         addHit(request);
