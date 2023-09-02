@@ -64,7 +64,7 @@ public class EventControllerPublic {
                                             @Positive @RequestParam(defaultValue = "10") Integer size,
                                             HttpServletRequest request) {
         log.info("Got request GET all events with parameters: text = {}, categories = {}, paid={}, rangeStart = {}, rangeEnd = {}" +
-                ", onlyAvailable={}, sort={}, from = {}, size = {}", text, categories, paid, rangeStart, rangeEnd, onlyAvailable, sort, from, size);
+                ", onlyAvailable={}, sort={}, from = {}, size = {}", text, categories, paid, rangeStart.toString(), rangeEnd.toString(), onlyAvailable, sort, from, size);
         //LocalDateTime start = (rangeStart == null) ? null : LocalDateTime.parse(rangeStart, FORMATTER);
         //LocalDateTime end = (rangeEnd == null) ? null : LocalDateTime.parse(rangeEnd, FORMATTER);
         return eventService.getAllEventsPublic(text, categories, paid, rangeStart, rangeEnd, onlyAvailable, sort, from, size, request);
