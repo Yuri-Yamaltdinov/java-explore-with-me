@@ -199,6 +199,7 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
+    @Transactional
     public EventRateDto addLike(Long userId, Long eventId, Boolean isLike) {
         User user = userService.getOrThrow(userId);
         Event event = getOrThrow(eventId);
@@ -217,6 +218,7 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
+    @Transactional
     public void deleteLike(Long userId, Long eventId) {
         User user = userService.getOrThrow(userId);
         Event event = getOrThrow(eventId);
@@ -240,6 +242,14 @@ public class EventServiceImpl implements EventService {
     public List<InitiatorRateView> getUsersRatings(Integer from, Integer size) {
         Pagination page = new Pagination(from, size);
         return rateRepository.getAllUsersRateViews(page);
+    }
+
+
+    @Override
+    public void increaseConfirmedRequests(Event event) {
+        Long confirmedRequestsNew = event.getConfirmedRequests() + 1L;
+        event.setConfirmedRequests(confirmedRequestsNew);
+        eventRepository.saveAndFlush(event);
     }
 
     @Override
@@ -368,12 +378,6 @@ public class EventServiceImpl implements EventService {
         if (eventTime.isBefore(actualTime)) {
             throw new CustomValidationException("Event date and time has to be in the future");
         }
-    }
-
-    public void increaseConfirmedRequests(Event event) {
-        Long confirmedRequestsNew = event.getConfirmedRequests() + 1L;
-        event.setConfirmedRequests(confirmedRequestsNew);
-        eventRepository.saveAndFlush(event);
     }
 
     public Event getOrThrow(Long eventId) {
