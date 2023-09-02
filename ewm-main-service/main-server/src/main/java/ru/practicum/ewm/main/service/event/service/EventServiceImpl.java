@@ -195,7 +195,8 @@ public class EventServiceImpl implements EventService {
         Long views = result.get(uri);
 
         eventMapper.updateEventFromURDto(event, updateEventUserRequest);
-        return eventMapper.eventFullDtoFromEvent(eventRepository.save(event), views);
+        //return eventMapper.eventFullDtoFromEvent(eventRepository.save(event), views);
+        return eventMapper.eventFullDtoFromEvent(event, views);
     }
 
     @Override
