@@ -156,7 +156,6 @@ public class EventServiceImpl implements EventService {
         Map<String, Long> result = getViewsFromStatServer(List.of(event));
         Long views = result.get(uri);
 
-        //return eventMapper.eventFullDtoFromEvent(eventRepository.save(event), views);
         return eventMapper.eventFullDtoFromEvent(event, views);
     }
 
@@ -195,7 +194,6 @@ public class EventServiceImpl implements EventService {
         Long views = result.get(uri);
 
         eventMapper.updateEventFromURDto(event, updateEventUserRequest);
-        //return eventMapper.eventFullDtoFromEvent(eventRepository.save(event), views);
         return eventMapper.eventFullDtoFromEvent(event, views);
     }
 
