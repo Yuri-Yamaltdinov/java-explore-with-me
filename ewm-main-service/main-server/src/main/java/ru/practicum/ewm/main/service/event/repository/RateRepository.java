@@ -34,6 +34,6 @@ public interface RateRepository extends JpaRepository<EventUserRate, Long> {
             "ORDER BY ratesSum DESC")
     List<InitiatorRateView> getAllUsersRateViews(Pagination page);
 
-    boolean existsByUser_IdAndEvent_Id(Long userId, Long eventId);
+    boolean existsByUserIdAndEventId(Long userId, Long eventId);
 
 }

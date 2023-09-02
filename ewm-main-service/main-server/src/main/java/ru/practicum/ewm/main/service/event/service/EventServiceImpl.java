@@ -221,7 +221,7 @@ public class EventServiceImpl implements EventService {
     public void deleteLike(Long userId, Long eventId) {
         User user = userService.getOrThrow(userId);
         Event event = getOrThrow(eventId);
-        if (!rateRepository.existsByUser_IdAndEvent_Id(userId,eventId)) {
+        if (!rateRepository.existsByUserIdAndEventId(userId,eventId)) {
             throw new EntityNotFoundException(EventUserRate.class, "Event Rate does not exist. Nothing to delete.");
         }
         EventUserRate eventUserRate = EventUserRate.builder()
