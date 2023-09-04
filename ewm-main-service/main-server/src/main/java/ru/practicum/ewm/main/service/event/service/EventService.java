@@ -1,10 +1,9 @@
 package ru.practicum.ewm.main.service.event.service;
 
-import ru.practicum.ewm.main.service.event.dto.EventFullDto;
-import ru.practicum.ewm.main.service.event.dto.EventShortDto;
-import ru.practicum.ewm.main.service.event.dto.NewEventDto;
-import ru.practicum.ewm.main.service.event.dto.UpdateEventUserRequest;
+import ru.practicum.ewm.main.service.event.dto.*;
 import ru.practicum.ewm.main.service.event.model.Event;
+import ru.practicum.ewm.main.service.event.model.EventRateView;
+import ru.practicum.ewm.main.service.event.model.InitiatorRateView;
 import ru.practicum.ewm.main.service.event.model.State;
 
 import javax.servlet.http.HttpServletRequest;
@@ -58,4 +57,12 @@ public interface EventService {
                                          Integer size);
 
     EventFullDto updateEventAdmin(Long eventId, UpdateEventUserRequest updateEventUserRequest);
+
+    EventRateDto addLike(Long userId, Long eventId, Boolean isLike);
+
+    void deleteLike(Long userId, Long eventId);
+
+    List<EventRateView> getEventsRatings(Integer from, Integer size);
+
+    List<InitiatorRateView> getUsersRatings(Integer from, Integer size);
 }

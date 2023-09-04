@@ -5,10 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.ewm.main.service.event.dto.EventFullDto;
-import ru.practicum.ewm.main.service.event.dto.EventShortDto;
-import ru.practicum.ewm.main.service.event.dto.NewEventDto;
-import ru.practicum.ewm.main.service.event.dto.UpdateEventUserRequest;
+import ru.practicum.ewm.main.service.event.dto.*;
 import ru.practicum.ewm.main.service.event.service.EventService;
 
 import javax.validation.Valid;
@@ -58,6 +55,23 @@ public class EventControllerPrivate {
                                     @RequestBody @Valid UpdateEventUserRequest updateEventUserRequest) {
         log.info("Update event with userId={}, eventId={}", userId, eventId);
         return eventService.updateEvent(userId, eventId, updateEventUserRequest);
+    }
+
+    @PostMapping("/{eventId}/rate")
+    @ResponseStatus(HttpStatus.CREATED)
+    public EventRateDto addLike(@PathVariable Long userId,
+                                @PathVariable Long eventId,
+                                @RequestParam(required = true) Boolean isLike) {
+        log.info("Add like or dislike to event={}, by user={}", eventId, userId);
+        return eventService.addLike(userId, eventId, isLike);
+    }
+
+    @DeleteMapping("/{eventId}/rate")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteLike(@PathVariable Long userId,
+                                   @PathVariable Long eventId) {
+        log.info("Delete like or dislike from event={}, by user={}", eventId, userId);
+        eventService.deleteLike(userId, eventId);
     }
 
 }

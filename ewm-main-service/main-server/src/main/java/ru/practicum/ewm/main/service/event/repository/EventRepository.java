@@ -28,7 +28,7 @@ public interface EventRepository extends JpaRepository<Event, Long> {
             "OR (LOWER(e.annotation) LIKE LOWER(CONCAT('%', :text, '%'))) " +
             "OR (LOWER(e.description) LIKE LOWER(CONCAT('%', :text, '%'))) " +
             "OR (LOWER(e.title) LIKE LOWER(CONCAT('%', :text, '%'))) " +
-            "OR (CAST(:rangeStart AS date) IS NULL AND CAST(:rangeStart AS date) IS NULL)" +
+            "OR (CAST(:rangeStart AS date) IS NULL AND CAST(:rangeEnd AS date) IS NULL)" +
             "OR (CAST(:rangeStart AS date) IS NULL AND e.eventDate < CAST(:rangeEnd AS date)) " +
             "OR (CAST(:rangeEnd AS date) IS NULL AND e.eventDate > CAST(:rangeStart AS date)) " +
             "AND (e.confirmedRequests < e.participantLimit OR :onlyAvailable = FALSE)" +
@@ -46,7 +46,7 @@ public interface EventRepository extends JpaRepository<Event, Long> {
             "WHERE (:users IS NULL OR e.initiator.id IN :users) " +
             "AND (:states IS NULL OR e.state IN :states) " +
             "AND (:categories IS NULL OR e.category.id IN :categories) " +
-            "OR (CAST(:rangeStart AS date) IS NULL AND CAST(:rangeStart AS date) IS NULL)" +
+            "OR (CAST(:rangeStart AS date) IS NULL AND CAST(:rangeEnd AS date) IS NULL)" +
             "OR (CAST(:rangeStart AS date) IS NULL AND e.eventDate < CAST(:rangeEnd AS date)) " +
             "OR (CAST(:rangeEnd AS date) IS NULL AND e.eventDate > CAST(:rangeStart AS date)) " +
             "GROUP BY e.id " +
